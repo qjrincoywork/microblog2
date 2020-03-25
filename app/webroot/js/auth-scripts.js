@@ -1,0 +1,1 @@
+window.setTimeout("document.getElementById('flashMessage').style.display='none';", 3000);

@@ -1,0 +1,90 @@
+<?php
+  $gender = $this->Session->read('UserProfile')['gender'];
+  $email = $this->Session->read('UserProfile')['email'];
+  $username = $this->Session->read('User')['username'];
+?>
+<header class="header-desktop">
+    <div class="section__content section__content--p30">
+        <div class="container-fluid">
+            <div class="header-wrap">
+                <div class="nav-btn">
+                  <?php
+                    echo $this->Form->create('search', array(
+                      'class' => 'form-inline my-2 my-lg-0',
+                      'type' => 'GET',
+                      'url' => 'search_result'
+                    ));
+                    echo $this->Form->input('search', array(
+                      'label' => false,
+                      'class' => 'form-control ml-sm-2',
+                      'type' => 'search',
+                      'placeholder' => 'Search',
+                      'aria-label' => 'Search'
+                    ));
+                  ?>
+                </div>
+                <div class="form-header">
+                </div>
+                <div class="header-button">
+                    <div id="date" class="col">
+                    </div>
+                    <div id="time" class="col" style="width: 150px;"></div>
+                    <div class="noti-wrap">
+                        <div class="noti__item js-item-menu">
+                            <div class="notifi-dropdown js-dropdown">
+                                <div class="notifi__item">
+                                    <div class="bg-c2 img-cir img-40">
+                                        <i class="zmdi zmdi-account-box"></i>
+                                    </div>
+                                </div>
+                                <div class="notifi__item">
+                                    <div class="bg-c3 img-cir img-40">
+                                        <i class="zmdi zmdi-file-text"></i>
+                                    </div>
+                                </div>
+                                <div class="notifi__footer">
+                                    <a href="#">All notifications</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="account-wrap">
+                        <div class="account-item clearfix js-item-menu">
+                            <div class="content">
+                                <a class="js-acc-btn" href="#"><?= $username?></a>
+                            </div>
+                            <div class="account-dropdown js-dropdown">
+                                <div class="info clearfix">
+                                    <div class="image">
+                                        <img src='/img/<?= ($gender == 1) ? "default_avatar_m.svg" : "default_avatar_f.svg" ?>' />
+                                    </div>
+                                    <div class="content">
+                                        <h5 class="name">
+                                            <a href="#"><?= $username?></a>
+                                        </h5>
+                                        <span class="email"><?= $email ?></span>
+                                    </div>
+                                </div>
+                                <div class="account-dropdown__body">
+                                    <div class="account-dropdown__item">
+                                        <a href="<?= $this->Html->url('/users/logout')?>">
+                                            <i class="zmdi zmdi-power"></i>Logout</a>
+                                        <!-- <a href="/user/profile">
+                                            <i class="zmdi zmdi-account"></i>Profile</a> -->
+                                    </div>
+                                    <!-- <div class="change_password account-dropdown__item" href="/user/changepassword">
+                                        <a href="#">
+                                            <i class="zmdi zmdi-settings"></i>Change Password</a>
+                                    </div> -->
+                                </div>
+                                <div class="account-dropdown__footer">
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
