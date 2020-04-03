@@ -1,348 +1,497 @@
 <?php
 App::uses('AppController', 'Controller');
 App::uses('CakeEmail', 'Network/Email');
+App::import('Helper', 'SystemHelper');
 
 class UsersController extends AppController {
-    public $uses = ['User', 'UserProfile'];
-
-	public function beforeFilter() {
-		parent::beforeFilter();
-		$this->Auth->allow('register', 'activation', 'logout');
+    public $uses = ['User', 'UserProfile', 'Post', 'Follow'];
+    public $components = ['Paginator', 'RequestHandler', 'Email'];
+    
+    public function beforeFilter() {
+        parent::beforeFilter();
+        $this->Auth->allow('register', 'activation', 'logout');
         $this->layout = 'main';
-	}
-	
-	public function login() {
-        $this->layout = 'default';
-		if ($this->request->is('post')) {
-			$user = $this->User->find('first', [
-				'conditions' => [
-						['User.username' => $this->request->data['User']['log_username']]
-					]
-			]);
-			
-			if(!$user) {
-				$this->Flash->error(__('User does not exist'));
-			} else {
-				switch ($user['User']['is_online']) {
-					case 2:
-						$this->Flash->error(__('Please activate your account first, Thank you.'));
-						break;
-					case 3:
-						$this->Flash->error(__('Your account has been deactivated, Please Contact Admin.'));
-						break;
-					default:
-						$auth = password_verify($this->request->data['User']['log_password'] , $user['User']['password']);
-						if(!$auth) {
-							if($user['User']['attempts'] <= 4) {
-								$attempt = $user['User']['attempts'] + 1; 
-								$this->User->set(['id' => $user['User']['id'],
-												'attempts' => $attempt,
-												'modified' => date('Y-m-d H:i:s')]);
-								$this->User->save();
-								$this->Flash->error(__('Invalid username or password, try again'));
-							} else {
-								$this->User->set(['id' => $user['User']['id'],
-												'is_online' => 3,
-												'modified' => date('Y-m-d H:i:s')]);
-								$this->User->save();
-								$this->Flash->error(__('Your account has been deactivated, Please Contact Admin.'));
-							}
-						} else {
-							$this->User->set(['id' => $user['User']['id'],
-											'is_online' => 1,
-											'modified' => date('Y-m-d H:i:s')]);
-							$this->User->save();
-							$this->Session->write($user);
-							
-							unset($this->request->data['User']['log_password']);
-
-							$this->Auth->login($this->request->data);
-							return $this->redirect($this->Auth->redirectUrl());
-						}
-						break;
-				}
-			}
-		}
-	}
-	
-	public function logout() {
-		pr($this->Session->read('User'));
-		die(' logout');
-		/* $this->User->set(['id' => $user['User']['id'],
-						'is_online' => 1,
-						'modified' => date('Y-m-d H:i:s')]);
-		$this->User->save(); */
-		return $this->redirect($this->Auth->logout());
-	}
-
-    public function dashboard() {
-		$this->title = "User - Dashboard";
-		$data = 'Dashboard';
-		$this->set(compact('data'));
-        /* $this->User->recursive = 0;
-        $this->set('users', $this->paginate()); */
+        if($this->request->is('ajax')) {
+            $this->layout = 'ajax';
+        }
     }
 
-    public function view($id = null) {
-        $this->User->id = $id;
-        if (!$this->User->exists()) {
-            throw new NotFoundException(__('Invalid user'));
+    public function getPosts($ids) {
+        $id = $this->Session->read('User')['id'];
+        $conditions = [];
+        if(is_array($ids)) {
+            $conditions = ['Post.deleted' => 0];
+        } else {
+            if($ids !== $id) {
+                $conditions = ['Post.deleted' => 0];
+            }
         }
-        $this->set('user', $this->User->findById($id));
+        
+        $this->UserProfile->virtualFields['image'] = "CASE 
+                                                        WHEN UserProfile.image IS NULL
+                                                            THEN
+                                                                CASE
+                                                                WHEN UserProfile.gender != 1
+                                                                    THEN '/img/default_avatar_f.svg'
+                                                                    ELSE '/img/default_avatar_m.svg'
+                                                                END
+                                                        ELSE concat('/',UserProfile.image)
+                                                    END";
+        $this->Post->virtualFields['post_ago'] = "CASE
+                                                    WHEN Post.created between date_sub(now(), INTERVAL 120 second) and now() 
+                                                        THEN 'Just now'
+                                                    WHEN Post.created between date_sub(now(), INTERVAL 60 minute) and now() 
+                                                        THEN concat(minute(TIMEDIFF(now(), Post.created)), ' minutes ago')
+                                                    WHEN datediff(now(), Post.created) = 1 
+                                                        THEN 'Yesterday'
+                                                    WHEN Post.created between date_sub(now(), INTERVAL 24 hour) and now() 
+                                                        THEN concat(hour(TIMEDIFF(NOW(), Post.created)), ' hours ago')
+                                                    ELSE concat(datediff(now(), Post.created),' days ago')
+                                                END";
+        $this->paginate = [
+            'joins' => [
+                [
+                    'table' => 'Follows',
+                    'alias' => 'Follow',
+                    'type' => 'left',
+                    'foreignKey' => false,
+                    'conditions'=> ['UserProfile.user_id = Follow.following_id']
+                ],
+            ],
+            'conditions' => [
+                $conditions,
+                'Post.user_id' => $ids,
+            ],
+            'order' => [
+                'Post.created DESC'
+            ],
+            'limit' => 4
+        ];
+        return $this->paginate('Post');
+    }
+    
+    public function dashboard() {
+        $userId = $this->Session->read('User')['id'];
+        $ids = $this->Follow->find('list', [
+                    'fields' => ['Follow.following_id'],
+                    'conditions' => ['Follow.user_id' => $userId, 'Follow.deleted' => 0]
+        ]);
+        $ids[] = $userId;
+        $data = $this->getPosts($ids);
+        $this->set('data', $data);
+        $this->set('title_for_layout', 'Home page');
+    }
+    
+    public function profile() {
+        if(empty($this->request->params['named']['user_id'])) {
+            throw new NotFoundException();
+        }
+
+        if(!empty($this->request->params['named']['user_id'])){
+            $id = $this->request->params['named']['user_id'];
+            $this->UserProfile->virtualFields['image'] = "CASE 
+                                                            WHEN UserProfile.image IS NULL
+                                                                THEN
+                                                                    CASE
+                                                                    WHEN UserProfile.gender != 1
+                                                                        THEN '/img/default_avatar_f.svg'
+                                                                        ELSE '/img/default_avatar_m.svg'
+                                                                    END
+                                                            ELSE concat('/',UserProfile.image)
+                                                        END";
+            $profile = $this->UserProfile->find('first', [
+                'conditions' => ['UserProfile.user_id' => $id]
+            ]);
+            $data = $this->getPosts($id);
+            $this->set('profile', $profile);
+            $this->set('data', $data);
+        } 
+        
+        $this->set('title_for_layout', 'User Profile');
+    }
+    
+    public function edit() {
+        if($this->RequestHandler->isAjax()) {
+            if($this->request->is('post')) {
+                $datum['success'] = false;
+                $this->response->type('application/json');
+                $this->autoRender = false;
+                
+                $this->UserProfile->set($this->request->data);
+                if($this->UserProfile->validates($this->request->data)) {
+                    $this->UserProfile->save(h($this->request->data));
+                    $datum['success'] = true;
+                } else {
+                    $errors = $this->UserProfile->validationErrors;
+                    $datum['error'] = $errors;
+                }
+                
+                return json_encode($datum);
+            }
+            $id = $this->request->params['named']['id'];
+            $data = $this->UserProfile->find('first',[
+                'conditions' => ['User.id' => $id]
+            ]);
+            
+            $this->set('data', $data);
+        }
+    }
+
+    public function editPicture() {
+        if($this->RequestHandler->isAjax()) {
+            $datum['success'] = false;
+            if($this->request->is(['post', 'put'])) {
+                $this->response->type('application/json');
+                $this->autoRender = false;
+                $profile = $this->request->data;
+                $username = $this->Session->read('User')['username'];
+                $this->UserProfile->set($profile);
+                if($profile['UserProfile']['image'] == 'undefined') {
+                    $profile['UserProfile']['image'] = null;
+                    $this->UserProfile->save($profile);
+                    $datum['success'] = true;
+                } else {
+                    if($this->UserProfile->validates($profile)) {
+                        $uploadFolder = "img/".$username;
+                        
+                        if(!file_exists($uploadFolder)) {
+                            mkdir($uploadFolder);
+                        }
+                        
+                        $path = $uploadFolder."/".$profile['UserProfile']['image']['name'];
+                        if(move_uploaded_file($this->request->data['UserProfile']['image']['tmp_name'],
+                                              $path)) {
+                            $profile['UserProfile']['image'] = $path;
+                            if($this->UserProfile->save($profile)) {
+                                $datum['success'] = true;
+                            }
+                        }
+                    } else {
+                        $errors = $this->UserProfile->validationErrors;
+                        $datum['error'] = $errors;
+                    }
+                }
+                return json_encode($datum);
+            }
+            $id = $this->request->params['named']['id'];
+            $data = $this->UserProfile->find('first',[
+                'conditions' => ['User.id' => $id]
+            ]);
+            
+            $this->set('data', $data);
+        }
+    }
+
+    /* public function changePassword() {
+        if($this->RequestHandler->isAjax()) {
+            $id = $this->request->params['named']['id'];
+            $data = $this->UserProfile->find('first',[
+                'conditions' => ['User.id' => $id]
+            ]);
+            
+            $this->set('data', $data);
+        }
+    } */
+
+    public function search() {
+        $conditions = [];
+        if(isset($this->request->data['user'])){
+            $cond = [];
+            $cond['UserProfile.first_name LIKE'] = "%" . trim($this->request->data['user']) . "%";
+            $cond['UserProfile.last_name LIKE'] = "%" . trim($this->request->data['user']) . "%";
+            $cond['UserProfile.email LIKE'] = "%" . trim($this->request->data['user']) . "%";
+            $cond['UserProfile.middle_name LIKE'] = "%" . trim($this->request->data['user']) . "%";
+            $cond['UserProfile.suffix LIKE'] = "%" . trim($this->request->data['user']) . "%";
+            $conditions['OR'] = $cond;
+        }
+        
+        $this->paginate = ['conditions' => $conditions, 'limit' => 10];
+        $this->UserProfile->virtualFields['image'] = "CASE 
+                                                        WHEN UserProfile.image IS NULL
+                                                            THEN
+                                                                CASE
+                                                                WHEN UserProfile.gender != 1
+                                                                    THEN '/img/default_avatar_f.svg'
+                                                                    ELSE '/img/default_avatar_m.svg'
+                                                                END
+                                                        ELSE concat('/',UserProfile.image)
+                                                    END";
+        $data = $this->paginate('User');
+        $this->set('data',$data);
+    }
+
+    public function following() {
+        $field = key($this->request->params['named']);
+        $id = $this->request->params['named'][$field];
+        $myId = $this->Session->read('User')['id'];
+        if($field == 'user_id') {
+            $conditions = ['Follow.'.$field => $id];
+            $column = 'following_id';
+            $message = 'No user following';
+        } else {
+            $conditions = ['Follow.'.$field => $id];
+            $column = 'user_id';
+            $message = "Don't have any follower";
+        }
+        
+        $ids = $this->Follow->find('list', [
+                    'fields' => ['Follow.'.$column],
+                    'conditions' => [$conditions, 'Follow.deleted' => 0]
+        ]);
+        
+        $this->UserProfile->virtualFields['image'] = "CASE 
+                                                        WHEN UserProfile.image IS NULL
+                                                            THEN
+                                                                CASE
+                                                                WHEN UserProfile.gender != 1
+                                                                    THEN '/img/default_avatar_f.svg'
+                                                                    ELSE '/img/default_avatar_m.svg'
+                                                                END
+                                                        ELSE concat('/',UserProfile.image)
+                                                    END";
+        $this->paginate = [
+            'limit' => 1,
+            'conditions' => [
+                ['User.id' => $ids]
+            ]
+        ];
+        
+        $this->set('message', $message);
+        $this->set('data', $this->paginate());
+    }
+
+    public function follow() {
+        if($this->RequestHandler->isAjax()) {
+            $this->response->type('application/json');
+            $this->autoRender = false;
+            $datum['success'] = false;
+
+            $follow['Follow']['user_id'] = $this->Session->read('User')['id'];
+            $follow['Follow']['following_id'] = $this->request->data['following_id'];
+
+            $exists = $this->Follow->find('first', [
+                'conditions' => [
+                        ['Follow.following_id' => $follow['Follow']['following_id'],
+                         'Follow.user_id' => $follow['Follow']['user_id']
+                    ]
+                ]
+            ]);
+
+            if(!$exists) {
+                $this->Follow->save($follow);
+                $datum['success'] = true;
+            } else {
+                $status = $exists['Follow']['deleted'] ? 0 : 1;
+                $exists['Follow']['deleted'] = $status;
+                $this->Follow->save($exists);
+                $datum['success'] = true;
+            }
+
+            echo json_encode($datum);
+        }
+    }
+
+    public function testEmail() {
+        $mytoken = 'test';
+        $activationUrl = (isset($_SERVER['HTTPS']) === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . "/users/activation/" . $mytoken;
+        $to = 'quirjohnincoy@gmail.com';
+        $name = 'Quir John Incoy';
+        $subject = "Activation link sent on your email";
+        /* CakeEmail::configTransport('mailtrap', [
+            'host' => 'smtp.mailtrap.io',
+            'port' => 2525,
+            'username' => '7198513de5519f',
+            'password' => 'd14fb3fca0f037',
+            'className' => 'Smtp'
+          ]); */
+        $message = "Dear <span style='color:#666666'>" . $name . "</span>,<br/><br/>";
+        $message .= "Your account has been created successfully by Administrator.<br/>";
+        $message .= "Please find the below details of your account: <br/><br/>";
+        $message .= "<b>Full Name:</b> " . $name . "<br/>";
+        $message .= "<b>Email Address:</b> " . $to . "<br/>";
+        $message .= "<b>Activate your account by clicking </strong><a href='$activationUrl'>Activate Account now</a></strong></b><br/>";
+        $message .= "<br/>Thanks, <br/>YNS Team";
+
+        // $email = new CakeEmail('smtp');
+        $email = new CakeEmail();
+        $email->config('smtp')
+              ->emailFormat('html')
+              ->from(['quirjohnincoy.work@gmail.com' => 'Microblog'])
+              ->to($to)
+              ->subject($subject)
+              ->send($message);
+        /* $email = new CakeEmail('default');
+        $email->from(array('quirjohnincoy.work@gmail.com' => 'My Site'))
+            ->to('quirjohnincoy@gmail.com')
+            ->subject('About')
+            ->send('My message');
+            die('hit'); */
+        if($email->send()) {
+            echo 'Email Sent';
+        } else {
+            echo 'Email not Sent';
+        }
     }
 
     public function register() {
         $this->layout = 'default';
-        if ($this->request->is('post')) {
-			$mytoken = Security::hash(Security::randomBytes(32));
+        if ($this->request->is('ajax')) {
+            try {
+                $datum['success'] = false;
+                $this->response->type('application/json');
+                $this->autoRender = false;
 
-			$user['User']['username'] = $this->request->data['User']['username'];
-			$user['User']['password'] = $this->request->data['User']['password'];
-			$user['User']['token'] = $mytoken;
+                $mytoken = Security::hash(Security::randomBytes(32));
+                $this->request->data['User']['token'] = $mytoken;
+                $this->User->set($this->request->data);
 
-            $isValidated = $this->User->validates();
-
-            if ($isValidated) {
-				$this->User->save($user);
-				
-				$userProfile['UserProfile']['user_id'] = $this->User->id;
-				$userProfile['UserProfile']['email'] = $this->request->data['User']['email'];
-				$userProfile['UserProfile']['first_name'] = $this->request->data['User']['first_name'];
-				$userProfile['UserProfile']['last_name'] = $this->request->data['User']['last_name'];
-				$userProfile['UserProfile']['middle_name'] = $this->request->data['User']['middle_name'];
-				$userProfile['UserProfile']['suffix'] = $this->request->data['User']['suffix'];
-				$userProfile['UserProfile']['gender'] = $this->request->data['User']['gender'];
-				
-				$isProfileValidated = $this->UserProfile->validates();
-				if($isProfileValidated) {
-					if($this->UserProfile->save($userProfile)) {
-						$activationUrl = $_SERVER['HTTP_HOST'] . "/users/activation/" . $mytoken;
-						$subject = "Activation link sent on your email";
-						$name = $this->request->data['User']['last_name'].', '.$this->request->data['User']['first_name'].' '.$this->request->data['User']['middle_name'];
-						$to = trim($this->request->data['User']['email']);
-
-						$message = "Dear <span style='color:#666666'>" . $name . "</span>,<br/><br/>";
-						$message .= "Your account has been created successfully by Administrator.<br/>";
-						$message .= "Please find the below details of your account: <br/><br/>";
-						$message .= "<b>Full Name:</b> " . $name . "<br/>";
-						$message .= "<b>Email Address:</b> " . $this->data['User']['email'] . "<br/>";
-						$message .= "<b>Username:</b> " . $this->data['User']['username'] . "<br/>";
-						$message .= "<b>Activate your account by clicking </strong><a href='$activationUrl'>Activate Account now</a></strong></b><br/>";
-						$message .= "<br/>Thanks, <br/>YNS Team";
-						
-						$email = new CakeEmail('smtp');
-						$email->from(['quirjohnincoy.work@gmail.com' => 'Microblog'])
-							  ->to($to)
-							  ->subject($subject)
-							  ->emailFormat('html')
-							  ->send($message);
-						
-						$this->Flash->success(__('Register Successful, your confirmation email has been sent'));
-						return $this->redirect(['action' => 'login']);
-					} else {
-						$this->Flash->error(__('Register Failed in User Profile table, please try again'));
-					}
-				}
-				$this->Flash->error(__('The user profile could not be saved. Please, try again.'));
+                if($this->User->validates($this->request->data)) {
+                    $this->UserProfile->set($this->request->data);
+                    
+                    if($this->UserProfile->validates($this->request->data)) {
+                        $this->User->save(h($this->request->data));
+                        $this->request->data['UserProfile']['user_id'] = $this->User->id;
+                        if($this->UserProfile->save(h($this->request->data))) {
+                            $activationUrl = (isset($_SERVER['HTTPS']) === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . "/users/activation/" . $mytoken;
+                            $subject = "Activation link sent on your email";
+                            $name = $this->request->data['UserProfile']['last_name'].', '.$this->request->data['UserProfile']['first_name'].' '.$this->request->data['UserProfile']['middle_name'];
+                            $to = trim($this->request->data['UserProfile']['email']);
+    
+                            $message = "Dear <span style='color:#666666'>" . $name . "</span>,<br/><br/>";
+                            $message .= "Your account has been created successfully by Administrator.<br/>";
+                            $message .= "Please find the below details of your account: <br/><br/>";
+                            $message .= "<b>Full Name:</b> " . $name . "<br/>";
+                            $message .= "<b>Email Address:</b> " . $to . "<br/>";
+                            $message .= "<b>Username:</b> " . $this->data['User']['username'] . "<br/>";
+                            $message .= "<b>Activate your account by clicking </strong><a href='$activationUrl'>Activate Account now</a></strong></b><br/>";
+                            $message .= "<br/>Thanks, <br/>YNS Team";
+                            
+                            $email = new CakeEmail('smtp');
+                            $email->from(['quirjohnincoy.work@gmail.com' => 'Microblog'])
+                                    ->emailFormat('html')
+                                    ->to($to)
+                                    ->subject($subject)
+                                    ->send($message);
+                            
+                            $datum['success'] = true;
+                        }
+                    } else {
+                        $errors = $this->UserProfile->validationErrors;
+                        $datum['error'] = $errors;
+                    }
+                } else {
+                    $errors = $this->User->validationErrors;
+                    $datum['error'] = $errors;
+                }
+                
+                echo json_encode($datum);
             }
-            $this->Flash->error(__('The user could not be saved. Please, try again.'));
+            catch(Exception $e)
+            {
+                $datum['error'] = $e;
+                $datum['success'] = "false";
+                echo json_encode($datum);
+            }
         }
     }
-	
-	public function activation($token) {
+    
+    public function activation($token) {
+        if(!$token) {
+            throw new NotFoundException();
+            $this->Flash->error(__('Invalid token'));
+        }
+        
         $user = $this->User->find('first', [
             'conditions' => [
                     ['User.token' => $token]
                 ]
-		]);
-        $id = $user['User']['id'];
+        ]);
 
-        if (!$user) {
+        if(!$user) {
             throw new NotFoundException();
-		}
-		
-        if (isset($user['User']['is_online']) && $user['User']['is_online'] == 2) {
-			$this->User->set(['id' => $id, 'is_online' => 0, 'modified' => date('Y-m-d H:i:s')]);
-			$this->User->save();
-			$this->Flash->success(__('Account successfully verified!, You can now login'));
-			$this->redirect(['controller' => 'users', 'action' => 'login']);
+            $this->Flash->error(__('Invalid token!'));
+        }
+        
+        $id = $user['User']['id'];
+        
+        if(isset($user['User']['is_online']) && $user['User']['is_online'] == 2) {
+            $this->User->set(['id' => $id, 'is_online' => 0, 'modified' => date('Y-m-d H:i:s')]);
+            $this->User->save();
+            $this->Flash->success(__('Account successfully verified!, You can now login'));
+            $this->redirect(['controller' => 'users', 'action' => 'login']);
         } else {
             $this->Flash->error(__('Account was already verified!'));
-			$this->redirect(['controller' => 'users', 'action' => 'login']);
+            $this->redirect(['controller' => 'users', 'action' => 'login']);
         }
-	}
-
-    public function edit($id = null) {
-        $this->User->id = $id;
-        if (!$this->User->exists()) {
-            throw new NotFoundException(__('Invalid user'));
-        }
-        if ($this->request->is('post') || $this->request->is('put')) {
-            if ($this->User->save($this->request->data)) {
-                $this->Flash->success(__('The user has been saved'));
-                return $this->redirect(array('action' => 'index'));
+    }
+    
+    public function login() {
+        $this->layout = 'default';
+        /* if($this->Session->read('User')) {
+            return $this->redirect($this->Auth->redirectUrl());
+        } */
+        
+        if($this->request->is('post')) {
+            $user = $this->User->find('first', [
+                'conditions' => [
+                        ['User.username' => $this->request->data['User']['log_username']]
+                    ]
+            ]);
+            
+            if(!$user) {
+                $this->Flash->error(__('User does not exist'));
+            } else {
+                switch ($user['User']['is_online']) {
+                    case 2:
+                        $this->Flash->error(__('Please activate your account first, Thank you.'));
+                        break;
+                    case 3:
+                        $this->Flash->error(__('Your account has been deactivated, Please Contact Admin.'));
+                        break;
+                    default:
+                        $auth = password_verify($this->request->data['User']['log_password'] , $user['User']['password']);
+                        if(!$auth) {
+                            if($user['User']['attempts'] <= 4) {
+                                $attempt = $user['User']['attempts'] + 1; 
+                                $this->User->set(['id' => $user['User']['id'],
+                                                'attempts' => $attempt,
+                                                'modified' => date('Y-m-d H:i:s')]);
+                                $this->User->save();
+                                $this->Flash->error(__('Invalid username or password, try again'));
+                            } else {
+                                $this->User->set(['id' => $user['User']['id'],
+                                                'is_online' => 3,
+                                                'modified' => date('Y-m-d H:i:s')]);
+                                $this->User->save();
+                                $this->Flash->error(__('Your account has been deactivated, Please Contact Admin.'));
+                            }
+                        } else {
+                            $this->User->set(['id' => $user['User']['id'],
+                                            'is_online' => 1,
+                                            'attempts' => 0,
+                                            'modified' => date('Y-m-d H:i:s')]);
+                            $this->User->save();
+                            $this->Session->write($user);
+                            
+                            unset($this->request->data['User']['log_password']);
+                            
+                            $this->Auth->login($this->request->data);
+                            return $this->redirect($this->Auth->redirectUrl("/users/dashboard"));
+                        }
+                        break;
+                }
             }
-            $this->Flash->error(
-                __('The user could not be saved. Please, try again.')
-            );
-        } else {
-            $this->request->data = $this->User->findById($id);
-            unset($this->request->data['User']['password']);
         }
     }
-
-    public function delete($id = null) {
-        // Prior to 2.5 use
-        // $this->request->onlyAllow('post');
-
-        $this->request->allowMethod('post');
-
-        $this->User->id = $id;
-        if (!$this->User->exists()) {
-            throw new NotFoundException(__('Invalid user'));
+    
+    public function logout() {
+        if($this->Session->read('User')) {
+            $id = $this->Session->read('User')['id'];
+            $this->User->set(['id' => $id,
+                            'is_online' => 0,
+                            'modified' => date('Y-m-d H:i:s')]);
+            $this->User->save();
         }
-        if ($this->User->delete()) {
-            $this->Flash->success(__('User deleted'));
-            return $this->redirect(array('action' => 'index'));
-        }
-        $this->Flash->error(__('User was not deleted'));
-        return $this->redirect(array('action' => 'index'));
+        return $this->redirect($this->Auth->logout());
     }
-
 }
-/* class UsersController extends AppController {
-	
-	public function index() {
-		if($this->request->is('post')) {
-			$userTable = TableRegistry::get('Users');
-			$userProfileTable = TableRegistry::get('UserProfiles');
-			$user = $userTable->newEntity();
-			$userProfile = $userProfileTable->newEntity();
-			
-			$hasher = new DefaultPasswordHasher();
-			$myusername = $this->request->getData('username');
-			$myemail = $this->request->getData('email');
-			$mypass = Security::hash($this->request->getData('password'), 'sha256', false);
-			$mytoken = Security::hash(Security::randomBytes(32));
-
-			$user->username = $myusername;
-			$user->password = $hasher->hash($mypass);
-			$user->token = $mytoken;
-			$user->created = date('Y-m-d H:i:s');
-			$user->modified = date('Y-m-d H:i:s');
-			
-			if($userTable->save($user)) {
-				$userProfile->email = $myemail;
-				$userProfile->first_name = $this->request->getData('first_name');
-				$userProfile->last_name = $this->request->getData('last_name');
-				$userProfile->middle_name = $this->request->getData('middle_name');
-				$userProfile->suffix = $this->request->getData('suffix');
-				$userProfile->gender = $this->request->getData('gender');
-				$userProfile->created = date('Y-m-d H:i:s');
-				$userProfile->modified = date('Y-m-d H:i:s');
-				if($userProfileTable->save($userProfile)) {
-					$this->Flash->set('Register Successful, your confirmation email has been sent', ['element' => 'success']);
-					
-					Email::configTransport('mailtrap', [
-						'host' => 'smtp.mailtrap.io',
-						'port' => 2525,
-						'username' => '7198513de5519f',
-						'password' => 'd14fb3fca0f037',
-						'className' => 'Smtp'
-					]);
-					
-					$email = new Email('default');
-					$email->transport('mailtrap');
-					$email->emailFormat('html');
-					$email->from('quirjohnincoy.work@gmail.com', 'Quir John Incoy');
-					$email->subject('Please confirm your email to activate your account');
-					$email->to($myemail);
-					$email->send('Hi '.$myusername. '</br>Please confirm your email link below</br><a href="http://local.cakephp/users/verification/'. $mytoken .'">Email Verification</a></br>Thank you');
-				} else {
-					$this->Flash->set('Register Failed in User Profile table, please try again', ['element' => 'error']);
-				}
-			} else {
-				$this->Flash->set('Register Failed in User table, please try again', ['element' => 'error']);
-			}
-		}
-	}
-
-	public function register() {
-		if($this->request->is('post')) {
-			$users = ClassRegistry::init('Users');
-			// $user = ClassRegistry::getObject('Users');
-			echo "<pre>";
-			print_r($users);
-			die(' hit register');
-			$userTable = ClassRegistry::get('Users');
-			$userProfileTable = TableRegistry::get('UserProfiles');
-			$user = $userTable->newEntity();
-			$userProfile = $userProfileTable->newEntity();
-			$hasher = new DefaultPasswordHasher();
-			$myusername = $this->request->getData('username');
-			$myemail = $this->request->getData('email');
-			$mypass = Security::hash($this->request->getData('password'), 'sha256', false);
-			$mytoken = Security::hash(Security::randomBytes(32));
-
-			$user->username = $myusername;
-			$user->password = $hasher->hash($mypass);
-			$user->token = $mytoken;
-			$user->created = date('Y-m-d H:i:s');
-			$user->modified = date('Y-m-d H:i:s');
-			
-			if($userTable->save($user)) {
-				$userProfile->email = $myemail;
-				$userProfile->first_name = $this->request->getData('first_name');
-				$userProfile->last_name = $this->request->getData('last_name');
-				$userProfile->middle_name = $this->request->getData('middle_name');
-				$userProfile->suffix = $this->request->getData('suffix');
-				$userProfile->gender = $this->request->getData('gender');
-				$userProfile->created = date('Y-m-d H:i:s');
-				$userProfile->modified = date('Y-m-d H:i:s');
-				if($userProfileTable->save($userProfile)) {
-					$this->Flash->set('Register Successful, your confirmation email has been sent', ['element' => 'success']);
-					
-					Email::configTransport('mailtrap', [
-						'host' => 'smtp.mailtrap.io',
-						'port' => 2525,
-						'username' => '7198513de5519f',
-						'password' => 'd14fb3fca0f037',
-						'className' => 'Smtp'
-					]);
-					
-					$email = new Email('default');
-					$email->transport('mailtrap');
-					$email->emailFormat('html');
-					$email->from('quirjohnincoy.work@gmail.com', 'Quir John Incoy');
-					$email->subject('Please confirm your email to activate your account');
-					$email->to($myemail);
-					$email->send('Hi '.$myusername. '</br>Please confirm your email link below</br><a href="http://local.cakephp/users/verification/'. $mytoken .'">Email Verification</a></br>Thank you');
-				} else {
-					$this->Flash->set('Register Failed in User Profile table, please try again', ['element' => 'error']);
-				}
-			} else {
-				$this->Flash->set('Register Failed in User table, please try again', ['element' => 'error']);
-			}
-		}
-	}
-	
-	public function verification($token) {
-		$userTable = TableRegistry::get('Users');
-		$verify = $userTable->find('all')->where(['token' => $token])->first();
-		$verify->deleted = 1;
-		$userTable->save($verify);
-	}
-	
-	public function login() {
-		if($this->request->is('post')) {
-			$userTable = TableRegistry::get('Users');
-			$user = $userTable->newEntity();
-
-			$hasher = new DefaultPasswordHasher();
-			$myname = $this->request->getData('name');
-			$myemail = $this->request->getData('email');
-			$mypass = Security::hash($this->request->getData('password'));
-
-		}
-	}
-} */

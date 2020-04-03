@@ -279,6 +279,97 @@ section {
     .container {
         max-width: 1320px;
     }
+    .microblogLogo {
+        text-align: center;
+    }
+    .post-form-container {
+        margin-bottom: 4rem;
+    }
+    .post-container {
+        margin-top: .5em;
+        padding: 1rem 1rem 0 1rem;
+    }
+    .post-buttons {
+        text-align: center;
+    }
+    .post-buttons span {
+        color: #4c82a3;
+    }
+    .system-action-buttons button span {
+        color: #4c82a3;
+        float: right;
+    }
+    .system-action-buttons button {
+        float: right;
+    }
+    .comment-buttons span {
+        color: #4c82a3;
+    }
+    .post-img {
+        text-align: center;
+    }
+    .post-img img {
+        width: 60%;
+    }
+    .post-content {
+        word-break: break-all;
+    }
+    .post-user {
+        margin-right: 1rem;
+        color: #0d93e8;
+        font-weight: bold;
+    }
+    .user-profile-pic .overlay {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        width: 100%;
+        opacity: 0;
+        transition: .3s ease;
+        background-color:#79a5c18c;
+    }
+    .user-profile-pic:hover .overlay {
+        opacity: 1;
+        cursor: pointer;
+    }
+    .user-profile-pic .overlay .icon{
+        color: white;
+        font-size: 2rem;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        text-align: center;
+    }
+    .post-ago {
+        font-size: 12px;
+        color: rgb(101, 119, 134);
+    }
+    .follow-button button {
+        float: right;
+        border-radius: 11px;
+    }
+    .comments-container button[class*="unfollow_user"]:hover {
+        color: #fff !important;
+        background: #dc3545!important;
+        border: none;
+    }
+    .following button {
+        border: none;
+        border-radius: 11px;
+    }
+    .followers button {
+        border: none;
+        border-radius: 11px;
+    }
+    .paging {
+        text-align: center;
+        padding-top: 2em;
+    }
 }
 
 /*Page Objects*/
@@ -318,6 +409,7 @@ section {
 .main-content {
     padding-right: 20rem;
     padding-top: 5.2em;
+    padding-bottom: 2em;
     min-height: 100vh;
     background: #fff;
 }
@@ -1184,10 +1276,12 @@ section {
 
 /* ----- Header ----- */
 .header-desktop {
-    background: #f5f5f5;
-    -webkit-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
-    -moz-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
+    /* background: #f5f5f5;
     box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
+    -moz-box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1); */
+    background: #79a5c1;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
     position: fixed;
     top: 0;
     right: 0;

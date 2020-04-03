@@ -2,39 +2,48 @@
 App::uses('AppModel', 'Model');
 
 class UserProfile extends AppModel {
-    public $validate = array(
-        'email' => array(
-            'required' => array(
+    public $belongsTo = ['User'];
+    
+    public $validate = [
+        'email' => [
+            'emailRule-1' => [
                 'rule' => 'notBlank',
-                'message' => 'A email is required'
-            )
-        ),
-        'first_name' => array(
-            'required' => array(
+                'message' => 'Email is required'
+            ],
+            'emailRule-2' => [
+                'rule' => 'email',
+                'message' => 'Invalid Email format'
+            ]
+        ],
+        'first_name' => [
+            'first_nameRule-1' => [
                 'rule' => 'notBlank',
-                'message' => 'A first name is required'
-            )
-        ),
-        'last_name' => array(
-            'required' => array(
+                'message' => 'First name is required'
+            ]
+        ],
+        'last_name' => [
+            'last_nameRule-1' => [
                 'rule' => 'notBlank',
-                'message' => 'A last name is required'
-            )
-        )/* ,
-        'gender' => array(
-            'required' => array(
-                'message' => 'A gender is required'
-            )
-        ) */
-    );
-
-    /* public function beforeSave($options = array()) {
-        if (isset($this->data[$this->alias]['password'])) {
-            $passwordHasher = new BlowfishPasswordHasher();
-            $this->data[$this->alias]['password'] = $passwordHasher->hash(
-                $this->data[$this->alias]['password']
-            );
-        }
-        return true;
-    } */
+                'message' => 'Last name is required'
+            ]
+        ],
+        'gender' => [
+            'genderRule-1' => [
+                'rule' => 'notBlank',
+                'message' => 'Gender is required'
+            ]
+        ],
+        'image' => [
+            'imageRule-1' => [
+                'rule' => ['mimeType', ['image/gif', 'image/png', 'image/jpg', 'image/jpeg']],
+                'allowEmpty' => true,
+                'message'=>'Please input a valid image'
+            ],
+            'imageRule-2' => [
+                'rule' => ['uploadError'],
+                'allowEmpty' => true,
+                'message' => "Image upload failed"
+            ]
+        ]
+    ];
 }

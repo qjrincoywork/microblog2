@@ -1,24 +1,23 @@
 <?php
   $gender = $this->Session->read('UserProfile')['gender'];
   $email = $this->Session->read('UserProfile')['email'];
-  $username = $this->Session->read('User')['username'];
+  $myId = $this->Session->read('User')['id'];
+  $myPic = $this->System->getUserPic($myId);
+  $myFullName = $this->System->getFullNameById($myId);
 ?>
 <header class="header-desktop">
     <div class="section__content section__content--p30">
         <div class="container-fluid">
             <div class="header-wrap">
-                <div class="nav-btn">
+                <div class="search">
                   <?php
-                    echo $this->Form->create('search', array(
-                      'class' => 'form-inline my-2 my-lg-0',
-                      'type' => 'GET',
-                      'url' => 'search_result'
-                    ));
                     echo $this->Form->input('search', array(
+                      'href' => $this->Html->url('/users/search'),
                       'label' => false,
                       'class' => 'form-control ml-sm-2',
                       'type' => 'search',
-                      'placeholder' => 'Search',
+                      'placeholder' => 'Search...',
+                      'required' => true,
                       'aria-label' => 'Search'
                     ));
                   ?>
@@ -51,34 +50,28 @@
                     <div class="account-wrap">
                         <div class="account-item clearfix js-item-menu">
                             <div class="content">
-                                <a class="js-acc-btn" href="#"><?= $username?></a>
+                                <a class="js-acc-btn" href="#"><?= $myFullName?></a>
                             </div>
                             <div class="account-dropdown js-dropdown">
                                 <div class="info clearfix">
                                     <div class="image">
-                                        <img src='/img/<?= ($gender == 1) ? "default_avatar_m.svg" : "default_avatar_f.svg" ?>' />
+                                        <img src='<?=$myPic?>' />
                                     </div>
                                     <div class="content">
                                         <h5 class="name">
-                                            <a href="#"><?= $username?></a>
+                                            <a href="#"><?= $myFullName?></a>
                                         </h5>
                                         <span class="email"><?= $email ?></span>
                                     </div>
                                 </div>
                                 <div class="account-dropdown__body">
                                     <div class="account-dropdown__item">
+                                        <!-- <a href="<?= $this->Html->url(['controller' => 'users', 'action' => 'changePassword', 'id' => $myId])?>">
+                                            <i class="fas fa-key"></i> Change Password
+                                        </a> -->
                                         <a href="<?= $this->Html->url('/users/logout')?>">
                                             <i class="zmdi zmdi-power"></i>Logout</a>
-                                        <!-- <a href="/user/profile">
-                                            <i class="zmdi zmdi-account"></i>Profile</a> -->
                                     </div>
-                                    <!-- <div class="change_password account-dropdown__item" href="/user/changepassword">
-                                        <a href="#">
-                                            <i class="zmdi zmdi-settings"></i>Change Password</a>
-                                    </div> -->
-                                </div>
-                                <div class="account-dropdown__footer">
-                                    
                                 </div>
                             </div>
                         </div>

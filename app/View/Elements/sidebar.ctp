@@ -1,20 +1,23 @@
+<?php
+    $id = $this->Session->read('User')['id'];
+?>
 <aside class="menu-sidebar d-none d-lg-block border">
     <div class="menu-sidebar__content js-scrollbar1">
-        <div class="profile-sidebar">
-            <div class="image">
-                <img src='/img/<?= ($this->Session->read('UserProfile')['gender'] == 1) ? "default_avatar_m.svg" : "default_avatar_f.svg" ?>' />
-            </div>
+        <div class="image microblogLogo">
+            <img src='/img/microbloglogo.png'/>
         </div>
         <nav class="navbar-sidebar" id="navbar-sidebar">
             <ul class="list-unstyled navbar__list">
                 <li <?= $this->here == '/users/dashboard' ? 'class="active"' : '' ?>>
                     <a href="<?= $this->Html->url('/users/dashboard')?>">
-                        <i class="fas fa-tachometer-alt"></i> Home </a>
+                        <i class="fas fa-home"></i> Home </a>
                 </li>
-                <li <?= $this->here == '/users/profiile' ? 'class="active"' : '' ?>>
-                    <a class="js-arrow" href="#">
-                        <i class="fas fa-tasks"></i> Profile </a>
-
+                <li <?= $this->here == "/users/profile/user_id:$id" ? 'class="active"' : '' ?>>
+                    <a class="js-arrow" href="<?= $this->Html->url(['controller'=>'users',
+                                                                    'action'=>'profile',
+                                                                    'user_id'=> $id])?>">
+                        <i class="fas fa-address-card"></i> Profile </a>
+                        
                     <!-- <ul class="list-unstyled navbar__sub-list js-sub-list">
                         <li {!! $routeName[1] == 'user' ? 'class="active"' : '' !!}>
                             <a href="{{ '/user' }}"> Users</a>

@@ -64,6 +64,12 @@ section {
     display: block;
 }
 
+.header-desktop {
+    background-color: #79a5c1;
+    box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.35);
+    padding: 20px;
+}
+
 body {
     margin: 0;
     font-family: "Nunito", sans-serif;
@@ -4380,6 +4386,10 @@ input[type="button"].btn-block {
     transition: transform 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, -webkit-transform 0.15s ease-in-out, -webkit-box-shadow 0.15s ease-in-out;
 }
 
+.help-block {
+    color: #e3342f;
+    text-align: right;
+}
 @media screen and (prefers-reduced-motion: reduce) {
     .custom-switch .custom-control-label::after {
         -webkit-transition: none;
@@ -5958,6 +5968,7 @@ a.badge-dark:focus {
     color: #385d7a;
     background-color: #e2f0fb;
     border-color: #d6e9f9;
+    text-align: center;
 }
 
 .alert-info hr {
@@ -5972,6 +5983,7 @@ a.badge-dark:focus {
     color: #857b26;
     background-color: #fffbdb;
     border-color: #fffacc;
+    text-align: center;
 }
 
 .alert-warning hr {

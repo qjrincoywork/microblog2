@@ -3,31 +3,35 @@ App::uses('AppModel', 'Model');
 App::uses('BlowfishPasswordHasher', 'Controller/Component/Auth');
 
 class User extends AppModel {
+    public $actsAs = ['Containable'];
     public $hasOne = 'UserProfile';
-    // public $hasOne = ['UserProfile' => ['className' => 'Profile']];
-    /* public $name = 'User';
-
-    public $hasOne = array(
-        'Profile' => array('className' => 'User.UserProfile')
-    ); */
+    public $hasMany = ['Follow', 'Post', 'Comment', 'Like'];
 
     public $validate = [
         'username' => [
-            'required' => [
-                'rule' => ['notBlank', 'isUnique'],
-                'message' => 'A username is required'
+            'usernameRule-1' => [
+                'rule' => 'notBlank',
+                'message' => 'Username is required'
+            ],
+            'usernameRule-2'=> [
+                'rule' => 'isUnique',
+                'message' => 'Username already exists'
             ]
         ],
         'password' => [
-            'required' => [
+            'passwordRule-1' => [
                 'rule' => 'notBlank',
-                'message' => 'A password is required'
+                'message' => 'Password is required'
+            ],
+            'passwordRule-2' => [
+                'rule' => "/^(?=.*\d)(?=.*[@#\-_$%^&+=§!\?])(?=.*[a-z])(?=.*[A-Z])[0-9A-Za-z@#\-_$%^&+=§!\?]{8,20}$/",
+                'message' => 'The password does not meet the requirements'
             ]
         ],
         'token' => [
             'required' => [
                 'rule' => 'notBlank',
-                'message' => 'A token is required'
+                'message' => 'token is required'
             ]
         ]
     ];
@@ -40,5 +44,71 @@ class User extends AppModel {
             );
         }
         return true;
+    }
+
+    public function getPost($postId)
+    {
+        $this->UserProfile->virtualFields['image'] = "CASE 
+                                                        WHEN UserProfile.image IS NULL
+                                                            THEN
+                                                                CASE
+                                                                WHEN UserProfile.gender != 1
+                                                                    THEN '/img/default_avatar_f.svg'
+                                                                    ELSE '/img/default_avatar_m.svg'
+                                                                END
+                                                        ELSE concat('/',UserProfile.image)
+                                                      END";
+        $this->Post->virtualFields['post_ago'] = "CASE
+                                                    WHEN Post.created between date_sub(now(), INTERVAL 120 second) and now() 
+                                                        THEN 'Just now'
+                                                    WHEN Post.created between date_sub(now(), INTERVAL 60 minute) and now() 
+                                                        THEN concat(minute(TIMEDIFF(now(), Post.created)), ' minutes ago')
+                                                    WHEN datediff(now(), Post.created) = 1 
+                                                        THEN 'Yesterday'
+                                                    WHEN Post.created between date_sub(now(), INTERVAL 24 hour) and now() 
+                                                        THEN concat(hour(TIMEDIFF(NOW(), Post.created)), ' hours ago')
+                                                    ELSE concat(datediff(now(), Post.created),' days ago')
+                                                END";
+                                                
+        $data = $this->Post->find('first',[
+            'conditions' => ['Post.id' => $postId]
+        ]);
+        
+        return $data;
+    }
+
+    public function getUserPost($userId) 
+    {
+        $this->UserProfile->virtualFields['image'] = "CASE 
+                                                        WHEN UserProfile.image IS NULL
+                                                            THEN
+                                                                CASE
+                                                                WHEN UserProfile.gender != 1
+                                                                    THEN '/img/default_avatar_f.svg'
+                                                                    ELSE '/img/default_avatar_m.svg'
+                                                                END
+                                                        ELSE concat('/',UserProfile.image)
+                                                      END";
+        $this->Post->virtualFields['post_ago'] = "CASE
+                                                    WHEN Post.created between date_sub(now(), INTERVAL 120 second) and now() 
+                                                        THEN 'Just now'
+                                                    WHEN Post.created between date_sub(now(), INTERVAL 60 minute) and now() 
+                                                        THEN concat(minute(TIMEDIFF(now(), Post.created)), ' minutes ago')
+                                                    WHEN datediff(now(), Post.created) = 1 
+                                                        THEN 'Yesterday'
+                                                    WHEN Post.created between date_sub(now(), INTERVAL 24 hour) and now() 
+                                                        THEN concat(hour(TIMEDIFF(NOW(), Post.created)), ' hours ago')
+                                                    ELSE concat(datediff(now(), Post.created),' days ago')
+                                                END";
+                                                
+        $data = $this->Post->find('all',[
+            'Post.deleted' => 0,
+            'conditions' => ['Post.user_id' => $userId],
+            'order' => [
+                'Post.created DESC'
+            ]
+        ]);
+        
+        return $data;
     }
 }

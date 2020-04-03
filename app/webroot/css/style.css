@@ -591,7 +591,8 @@ body.no-nav .nav-btn {
     text-align: center;
 }
 
-.modal-dialog .modal-content .modal-body .card .card-body {
+.modal-dialog .modal-content .modal-body .container {
+    /* background-color: red; */
     /* Form Component */
     /* End of Form Component */
 }

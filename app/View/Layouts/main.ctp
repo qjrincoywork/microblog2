@@ -1,50 +1,52 @@
 <!DOCTYPE html>
 <html>
-    <head>		
+    <head>
         <?php echo $this->Html->charset(); ?>
         <title>
             <?php echo $this->fetch('title'); ?>
         </title>
         <?php
-            echo $this->Html->css('font-face');
-            echo $this->Html->css('all.min');
-            echo $this->Html->css('fontawesome.min');
-
-            echo $this->Html->css('material-design-iconic-font.min');
-            echo $this->Html->css('fonts');
-            
-            echo $this->Html->css('bootstrap.min');
-            echo $this->Html->css('animsition.min');
-            echo $this->Html->css('perfect-scrollbar');
-
-            echo $this->Html->css('simplebar');
-            echo $this->Html->css('app');
-            echo $this->Html->css('theme');
-            echo $this->Html->css('style');
+            echo $this->Html->css(['font-face','all.min','fontawesome.min',
+                                   'material-design-iconic-font.min', 'fonts',
+                                   'bootstrap.min', 'animsition.min', 'perfect-scrollbar',
+                                   'simplebar', 'app', 'theme', 'style'
+            ]);
         ?>
     </head>
 <body>
 	<?php echo $this->element('sidebar'); ?>
 	
-    <div class="page-container">
+    <div class="page-container" id='pageContainer'>
         <?php echo $this->element('header'); ?>
-	
+        <div class='modal fade' tabindex='-1' role='dialog'>
+            <div class='modal-dialog' role='document'>
+                <div class='modal-content'>
+                    <div class='modal-header'>
+                        <h5 class='modal-title' id='myModalLabel'></h5>
+                        <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+                            <span aria-hidden='true'>&times;</span>
+                        </button>
+                    </div>
+                    <div class='modal-body pt-2'>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="main-content" style=" height: 100%;">
-            <div class="section__content section__content--p30">
+            <div id="mainContent" class="section__content section__content--p30">
                 <?php echo $this->fetch('content'); ?>
             </div>
         </div>
     </div>
-
-    <div id="footer">
-        <?= $this->Html->script('jquery-3.2.1.min'); ?>
-        <?= $this->Html->script('bootstrap.min'); ?>
-        <?= $this->Html->script('animsition.min'); ?>
-        <?= $this->Html->script('perfect-scrollbar'); ?>
-
-        <?= $this->Html->script('simplebar'); ?>
-        <?= $this->Html->script('main'); ?>
-        <?= $this->Html->script('app-layout'); ?>
+    <div class="body-class animsition">
+        <div id="footer">
+            <?php echo $this->Html->script(['jquery-3.1.1.min','popper.min','bootstrap.min',
+                                            'bootstrap-notify.min', 'animsition.min', 'perfect-scrollbar',
+                                            'simplebar', 'main', 'app-layout', 'user-scripts'
+            ]);
+            ?>
+        </div>
     </div>
 </body>
 </html>

@@ -104,6 +104,28 @@ var fx = {
 
         console.log('fx.displayFormErrorMessage');
     },
+    'showFormErrors': function(errors) {
+        $.each(errors, function(fieldName, message){
+            $("[id="+fieldName+"]").addClass('is-invalid');
+            
+            if (message.length == 1) {
+                $("[id="+fieldName+"]").nextAll(".help-block").remove();
+                $("[id="+fieldName+"]").after("<span class='help-block'>" + message[0] + "</span>")
+            } else {
+                for (i = 0; i < message.length - 1; i++) {
+                    $("[id="+fieldName+"]").nextAll(".help-block").fadeOut();
+                    if (i == message.length - 1) {
+                        console.log('w/o br');
+                        $("[id="+fieldName+"]").after("<span class='help-block'>" + message[i] + "<br></span>")
+                    } else {
+                        console.log('w/ br');
+                        $("[id="+fieldName+"]").after("<span class='help-block'>" + message[i] + "</span>")
+                    }
+
+                }
+            }
+        });
+    },
     "displayNonModalFormErrorMessages": function (jsonError, form) {
         var content = "<ul class='errors'></ul>",
             errorWrapper = "<li>",
@@ -131,6 +153,7 @@ var fx = {
     },
     "displayNotify": function (title, mssg, type) {
         // console.log('displayNotify');
+        $.notifyClose();
         $.notify({
             // options
             icon: 'glyphicon glyphicon-warning-sign',
@@ -142,7 +165,7 @@ var fx = {
             position: null,
             type: type,
             allow_dismiss: true,
-            newest_on_top: false,
+            newest_on_top: true,
             showProgressbar: false,
             placement: {
                 from: "top",
