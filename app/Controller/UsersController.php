@@ -1,32 +1,20 @@
 <?php
 App::uses('AppController', 'Controller');
-App::uses('CakeEmail', 'Network/Email');
-App::import('Helper', 'SystemHelper');
 
 class UsersController extends AppController {
     public $uses = ['User', 'UserProfile', 'Post', 'Follow'];
-    public $components = ['Paginator', 'RequestHandler', 'Email'];
+    public $components = ['Paginator', 'RequestHandler'];
     
     public function beforeFilter() {
         parent::beforeFilter();
-        $this->Auth->allow('register', 'activation', 'logout');
+        $this->Auth->allow('register', 'activation', 'logout', 'testEmail');
         $this->layout = 'main';
         if($this->request->is('ajax')) {
             $this->layout = 'ajax';
         }
     }
 
-    public function getPosts($ids) {
-        $id = $this->Session->read('User')['id'];
-        $conditions = [];
-        if(is_array($ids)) {
-            $conditions = ['Post.deleted' => 0];
-        } else {
-            if($ids !== $id) {
-                $conditions = ['Post.deleted' => 0];
-            }
-        }
-        
+    public function getPosts($ids, $conditions = null) {
         $this->UserProfile->virtualFields['image'] = "CASE 
                                                         WHEN UserProfile.image IS NULL
                                                             THEN
@@ -77,18 +65,23 @@ class UsersController extends AppController {
                     'conditions' => ['Follow.user_id' => $userId, 'Follow.deleted' => 0]
         ]);
         $ids[] = $userId;
-        $data = $this->getPosts($ids);
+        $data = $this->getPosts($ids, ['Post.deleted' => 0]);
         $this->set('data', $data);
         $this->set('title_for_layout', 'Home page');
     }
     
     public function profile() {
+        $conditions = [];
         if(empty($this->request->params['named']['user_id'])) {
             throw new NotFoundException();
         }
-
+        
         if(!empty($this->request->params['named']['user_id'])){
-            $id = $this->request->params['named']['user_id'];
+            $id = $this->Session->read('User')['id'];
+            $userId = $this->request->params['named']['user_id'];
+            if($userId !== $id) {
+                $conditions = ['Post.deleted' => 0];
+            }
             $this->UserProfile->virtualFields['image'] = "CASE 
                                                             WHEN UserProfile.image IS NULL
                                                                 THEN
@@ -100,13 +93,13 @@ class UsersController extends AppController {
                                                             ELSE concat('/',UserProfile.image)
                                                         END";
             $profile = $this->UserProfile->find('first', [
-                'conditions' => ['UserProfile.user_id' => $id]
+                'conditions' => ['UserProfile.user_id' => $userId]
             ]);
-            $data = $this->getPosts($id);
+
+            $data = $this->getPosts($userId, $conditions);
             $this->set('profile', $profile);
             $this->set('data', $data);
-        } 
-        
+        }
         $this->set('title_for_layout', 'User Profile');
     }
     
@@ -265,10 +258,10 @@ class UsersController extends AppController {
             $this->response->type('application/json');
             $this->autoRender = false;
             $datum['success'] = false;
-
+            
             $follow['Follow']['user_id'] = $this->Session->read('User')['id'];
             $follow['Follow']['following_id'] = $this->request->data['following_id'];
-
+            
             $exists = $this->Follow->find('first', [
                 'conditions' => [
                         ['Follow.following_id' => $follow['Follow']['following_id'],
@@ -276,7 +269,7 @@ class UsersController extends AppController {
                     ]
                 ]
             ]);
-
+            
             if(!$exists) {
                 $this->Follow->save($follow);
                 $datum['success'] = true;
@@ -286,50 +279,8 @@ class UsersController extends AppController {
                 $this->Follow->save($exists);
                 $datum['success'] = true;
             }
-
+            
             echo json_encode($datum);
-        }
-    }
-
-    public function testEmail() {
-        $mytoken = 'test';
-        $activationUrl = (isset($_SERVER['HTTPS']) === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . "/users/activation/" . $mytoken;
-        $to = 'quirjohnincoy@gmail.com';
-        $name = 'Quir John Incoy';
-        $subject = "Activation link sent on your email";
-        /* CakeEmail::configTransport('mailtrap', [
-            'host' => 'smtp.mailtrap.io',
-            'port' => 2525,
-            'username' => '7198513de5519f',
-            'password' => 'd14fb3fca0f037',
-            'className' => 'Smtp'
-          ]); */
-        $message = "Dear <span style='color:#666666'>" . $name . "</span>,<br/><br/>";
-        $message .= "Your account has been created successfully by Administrator.<br/>";
-        $message .= "Please find the below details of your account: <br/><br/>";
-        $message .= "<b>Full Name:</b> " . $name . "<br/>";
-        $message .= "<b>Email Address:</b> " . $to . "<br/>";
-        $message .= "<b>Activate your account by clicking </strong><a href='$activationUrl'>Activate Account now</a></strong></b><br/>";
-        $message .= "<br/>Thanks, <br/>YNS Team";
-
-        // $email = new CakeEmail('smtp');
-        $email = new CakeEmail();
-        $email->config('smtp')
-              ->emailFormat('html')
-              ->from(['quirjohnincoy.work@gmail.com' => 'Microblog'])
-              ->to($to)
-              ->subject($subject)
-              ->send($message);
-        /* $email = new CakeEmail('default');
-        $email->from(array('quirjohnincoy.work@gmail.com' => 'My Site'))
-            ->to('quirjohnincoy@gmail.com')
-            ->subject('About')
-            ->send('My message');
-            die('hit'); */
-        if($email->send()) {
-            echo 'Email Sent';
-        } else {
-            echo 'Email not Sent';
         }
     }
 
@@ -353,20 +304,20 @@ class UsersController extends AppController {
                         $this->request->data['UserProfile']['user_id'] = $this->User->id;
                         if($this->UserProfile->save(h($this->request->data))) {
                             $activationUrl = (isset($_SERVER['HTTPS']) === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]" . "/users/activation/" . $mytoken;
-                            $subject = "Activation link sent on your email";
+                            $subject = "Microblog Account Activation";
                             $name = $this->request->data['UserProfile']['last_name'].', '.$this->request->data['UserProfile']['first_name'].' '.$this->request->data['UserProfile']['middle_name'];
                             $to = trim($this->request->data['UserProfile']['email']);
-    
-                            $message = "Dear <span style='color:#666666'>" . $name . "</span>,<br/><br/>";
+                            
+                            $message = "Dear <span style='color:#666666'>" . ucwords($name) . "</span>,<br/><br/>";
                             $message .= "Your account has been created successfully by Administrator.<br/>";
                             $message .= "Please find the below details of your account: <br/><br/>";
-                            $message .= "<b>Full Name:</b> " . $name . "<br/>";
+                            $message .= "<b>Full Name:</b> " . ucwords($name) . "<br/>";
                             $message .= "<b>Email Address:</b> " . $to . "<br/>";
                             $message .= "<b>Username:</b> " . $this->data['User']['username'] . "<br/>";
                             $message .= "<b>Activate your account by clicking </strong><a href='$activationUrl'>Activate Account now</a></strong></b><br/>";
                             $message .= "<br/>Thanks, <br/>YNS Team";
                             
-                            $email = new CakeEmail('smtp');
+                            $email = new CakeEmail('gmail');
                             $email->from(['quirjohnincoy.work@gmail.com' => 'Microblog'])
                                     ->emailFormat('html')
                                     ->to($to)

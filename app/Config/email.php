@@ -41,6 +41,18 @@ class EmailConfig {
         //'charset' => 'utf-8',
         //'headerCharset' => 'utf-8',
     );
+    
+    public $gmail = [
+        'host' => 'smtp.gmail.com',
+        'port' => 587,
+		'ssl_verify_peer' => false,
+		'ssl_verify_host' => false,
+        'username' => 'quirjohnincoy.work@gmail.com',
+        'password' => 'Yns!sre@l',
+        'transport' => 'Smtp',
+        'tls' => true,
+        'from' => 'quirjohnincoy.work@gmail.com'
+    ];
 
     public $smtp = array(
         /* 'transport' => 'Smtp',

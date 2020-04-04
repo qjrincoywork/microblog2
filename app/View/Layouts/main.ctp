@@ -2,6 +2,7 @@
 <html>
     <head>
         <?php echo $this->Html->charset(); ?>
+        <link rel="icon" href="/img/microMinilogo.png">
         <title>
             <?php echo $this->fetch('title'); ?>
         </title>
