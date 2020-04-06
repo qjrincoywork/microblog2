@@ -432,6 +432,15 @@ body .page-wrapper .page-container .main-content .section__content form .form-gr
     height: 6rem;
 }
 
+body .page-container .main-content .section__content .card-body .bd-note {
+    background-color: #ffffcc;
+    border-left: 6px solid #ffeb3b;
+}
+
+body .page-container .main-content .section__content .card-body .bd-note p {
+    padding: 0.25rem 0.75rem;
+}
+
 body .page-wrapper .page-container .main-content .section__content form .form-group .bd-note {
     margin-top: 1rem;
     background-color: #ffffcc;

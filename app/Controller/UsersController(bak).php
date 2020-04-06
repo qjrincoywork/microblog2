@@ -39,7 +39,7 @@ class UsersController extends AppController {
         $this->paginate = [
             'joins' => [
                 [
-                    'table' => 'Follows',
+                    'table' => 'follows',
                     'alias' => 'Follow',
                     'type' => 'left',
                     'foreignKey' => false,
@@ -129,34 +129,6 @@ class UsersController extends AppController {
             $this->set('data', $data);
         }
     }
-    
-    public function testEmail() {
-        try {
-            $activationUrl = (isset($_SERVER['HTTPS']) === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
-            $subject = "Microblog Account Activation";
-            $name = "Incoy, Quir John";
-            $to = trim("quirjohnincoy.work@gmail.com");
-            
-            $message = "Dear <span style='color:#666666'>" . ucwords($name) . "</span>,<br/><br/>";
-            $message .= "<b>Full Name:</b> " . ucwords($name) . "<br/>";
-            $message .= "<b>Email Address:</b> " . $to . "<br/>";
-            $message .= "<b>Activate your account by clicking </strong><a href='$activationUrl'>Activate Account now</a></strong></b><br/>";
-            
-            $email = new CakeEmail('gmail');
-            $email->from(['quirjohnincoy.work@gmail.com' => 'Microblog'])
-                    ->emailFormat('html')
-                    ->to($to)
-                    ->subject($subject)
-                    ->send($message);
-            if($email->send()) {
-                echo "Email sent";
-            } else {
-                echo "Email not sent";
-            }
-        } catch (\Throwable $th) {
-            echo $th;
-        }
-    }
 
     public function editPicture() {
         if($this->RequestHandler->isAjax()) {
@@ -203,30 +175,16 @@ class UsersController extends AppController {
         }
     }
 
-    public function changePassword() {
-        if($this->request->is('post')) {
-            $datum['success'] = false;
-            $this->response->type('application/json');
-            $this->autoRender = false;
+    /* public function changePassword() {
+        if($this->RequestHandler->isAjax()) {
+            $id = $this->request->params['named']['id'];
+            $data = $this->UserProfile->find('first',[
+                'conditions' => ['User.id' => $id]
+            ]);
             
-            $this->User->set($this->request->data);
-            if($this->User->validates($this->request->data)) {
-                $this->User->save(h($this->request->data));
-                $datum['success'] = true;
-            } else {
-                $errors = $this->User->validationErrors;
-                $datum['error'] = $errors;
-            }
-            
-            return json_encode($datum);
+            $this->set('data', $data);
         }
-        $id = $this->request->params['named']['id'];
-        $data = $this->User->find('first',[
-            'conditions' => ['User.id' => $id]
-        ]);
-        
-        $this->set('data', $data);
-    }
+    } */
 
     public function search() {
         $conditions = [];
@@ -351,11 +309,11 @@ class UsersController extends AppController {
                             $to = trim($this->request->data['UserProfile']['email']);
                             
                             $message = "Dear <span style='color:#666666'>" . ucwords($name) . "</span>,<br/><br/>";
-                            $message .= "Your account has been created successfully by Administrator.<br/>";
-                            $message .= "Please find the below details of your account: <br/><br/>";
+                            $message .= "Your account has been created successfully.<br/>";
+                            $message .= "Please look at the details of your account below: <br/><br/>";
                             $message .= "<b>Full Name:</b> " . ucwords($name) . "<br/>";
                             $message .= "<b>Email Address:</b> " . $to . "<br/>";
-                            $message .= "<b>Username:</b> " . $this->data['User']['username'] . "<br/>";
+                            $message .= "<b>Username:</b> " . $this->data['User']['username'] . "<br/><br/>";
                             $message .= "<b>Activate your account by clicking </strong><a href='$activationUrl'>Activate Account now</a></strong></b><br/>";
                             $message .= "<br/>Thanks, <br/>YNS Team";
                             

@@ -617,6 +617,15 @@ pre code {
     margin-left: auto;
 }
 
+body .page-container #content .card-body .bd-note {
+    background-color: #ffffcc;
+    border-left: 6px solid #ffeb3b;
+}
+
+body .page-container #content .card-body .bd-note p {
+    padding: 0.25rem 0.75rem;
+}
+
 .row {
     display: -webkit-box;
     display: -ms-flexbox;

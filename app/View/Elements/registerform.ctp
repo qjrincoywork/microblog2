@@ -1,6 +1,9 @@
 <div class="card">
-    <div class="card-header"><?= __('Sign up')?></div>
+    <!-- <div class="card-header"><?= __('Sign up')?></div> -->
         <div class="card-body card-block">
+            <div class="bd-note rounded">
+                <p><strong>NOTE:</strong> Please type the <strong>Passwords</strong> having 8 characters with At least 1 uppercase letter, lowercase  letters, numbers and 1 special character</p>
+            </div>
             <?= $this->Form->create('User',
                                     ['url' => 'register'],
                                     ['inputDefaults'=> ['div' => 'form-group']]); ?>
@@ -74,7 +77,7 @@
                     </div>
                     
                     <div class="col-md-12">
-                    <?= $this->Form->end(['label' => 'submit',
+                    <?= $this->Form->end(['label' => 'register',
                                             'class' => 'register_user btn btn-primary form-control',
                                             'div' => 'form-group mt-3']); ?>
                     </div>

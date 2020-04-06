@@ -30,6 +30,26 @@ class User extends AppModel {
             'passwordRule-2' => [
                 'rule' => "/^(?=.*\d)(?=.*[@#\-_$%^&+=§!\?])(?=.*[a-z])(?=.*[A-Z])[0-9A-Za-z@#\-_$%^&+=§!\?]{8,20}$/",
                 'message' => 'The password does not meet the requirements'
+            ],
+            'passwordRule-3' => [
+                'rule' => "confirmPassword",
+                'message' => "Does not match with confirm password"
+            ]
+        ],
+        'confirm_password' => [
+            'confirm_passwordRule-1' => [
+                'rule' => 'notBlank',
+                'message' => 'Confirm password is required'
+            ]
+        ],
+        'old_password' => [
+            'old_passwordRule-1' => [
+                'rule' => 'notBlank',
+                'message' => 'Old password is required'
+            ],
+            'old_passwordRule-2' => [
+                'rule' => 'validateOldPassword',
+                'message' => 'Not the same with old password'
             ]
         ],
         'token' => [
@@ -39,6 +59,26 @@ class User extends AppModel {
             ]
         ]
     ];
+    
+    public function confirmPassword() {
+        if ($this->data['User']['password'] !== $this->data['User']['confirm_password']){
+            return false;
+        }
+        return true;
+    }
+
+    public function validateOldPassword() {
+        $data = $this->find('first', [
+                            'conditions' => ['User.id' => $this->data['User']['id']]
+        ]);
+        
+        $same = password_verify($this->data['User']['old_password'], $data['User']['password']);
+
+        if (!$same){
+            return false;
+        }
+        return true;
+    }
 
     public function beforeSave($options = []) {
         if (isset($this->data[$this->alias]['password'])) {

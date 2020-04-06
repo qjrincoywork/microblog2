@@ -42,7 +42,7 @@ $(function () {
     $("body").on("click", ".post_content, .like_post, .comment_post, .edit_comment, .delete_comment,"+
                           ".edit_post, .share_post, .delete_post, .restore_post,"+
                           ".follow_user, .unfollow_user, .edit_profile, .get_follow," +
-                          ".update_picture", function (event) {
+                          ".update_picture, .change_password", function (event) {
         event.preventDefault();
         
         var form = $(this).closest("form").not(".form-group"),
@@ -164,6 +164,7 @@ $(function () {
                             case "restore_post":
                             case "edit_comment":
                             case "delete_comment":
+                            case "change_password":
                                 fx.displayNotify(
                                     title.charAt(0).toUpperCase() + title.slice(1),
                                     "Successfully " + notifAction + suffix + ".",

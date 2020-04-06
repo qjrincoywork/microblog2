@@ -66,9 +66,9 @@
                                 </div>
                                 <div class="account-dropdown__body">
                                     <div class="account-dropdown__item">
-                                        <!-- <a href="<?= $this->Html->url(['controller' => 'users', 'action' => 'changePassword', 'id' => $myId])?>">
+                                        <a href="<?= $this->Html->url(['controller' => 'users', 'action' => 'changePassword', 'id' => $myId])?>">
                                             <i class="fas fa-key"></i> Change Password
-                                        </a> -->
+                                        </a>
                                         <a href="<?= $this->Html->url('/users/logout')?>">
                                             <i class="zmdi zmdi-power"></i>Logout</a>
                                     </div>
