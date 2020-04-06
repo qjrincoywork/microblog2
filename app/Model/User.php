@@ -16,6 +16,10 @@ class User extends AppModel {
             'usernameRule-2'=> [
                 'rule' => 'isUnique',
                 'message' => 'Username already exists'
+            ],
+            'usernameRule-3' => [
+                'rule' => ['minLength', 8],
+                'message' => 'Minimum character is 8'
             ]
         ],
         'password' => [
