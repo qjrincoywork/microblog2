@@ -252,7 +252,35 @@ class UsersController extends AppController {
         $this->set('message', $message);
         $this->set('data', $this->paginate());
     }
-
+    
+    public function testEmail() {
+        try {
+            $activationUrl = (isset($_SERVER['HTTPS']) === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+            $subject = "Microblog Account Activation";
+            $name = "Incoy, Quir John";
+            $to = trim("quirjohnincoy.work@gmail.com");
+            
+            $message = "Dear <span style='color:#666666'>" . ucwords($name) . "</span>,<br/><br/>";
+            $message .= "<b>Full Name:</b> " . ucwords($name) . "<br/>";
+            $message .= "<b>Email Address:</b> " . $to . "<br/>";
+            $message .= "<b>Activate your account by clicking </strong><a href='$activationUrl'>Activate Account now</a></strong></b><br/>";
+            
+            $email = new CakeEmail('gmail');
+            $email->from(['quirjohnincoy.work@gmail.com' => 'Microblog'])
+                    ->emailFormat('html')
+                    ->to($to)
+                    ->subject($subject)
+                    ->send($message);
+            if($email->send()) {
+                echo "Email sent";
+            } else {
+                echo "Email not sent";
+            }
+        } catch (\Throwable $th) {
+            echo $th;
+        }
+    }
+    
     public function follow() {
         if($this->RequestHandler->isAjax()) {
             $this->response->type('application/json');
