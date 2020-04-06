@@ -39,7 +39,7 @@ class UsersController extends AppController {
         $this->paginate = [
             'joins' => [
                 [
-                    'table' => 'Follows',
+                    'table' => 'follows',
                     'alias' => 'Follow',
                     'type' => 'left',
                     'foreignKey' => false,
@@ -66,8 +66,6 @@ class UsersController extends AppController {
         ]);
         $ids[] = $userId;
         $data = $this->getPosts($ids, ['Post.deleted' => 0]);
-        pr($data);
-        die('hits');
         $this->set('data', $data);
         $this->set('title_for_layout', 'Home page');
     }
