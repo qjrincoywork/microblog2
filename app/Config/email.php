@@ -35,35 +35,32 @@
  * The origin email. See CakeEmail::from() about the valid values
  */
 class EmailConfig {
-    public $default = array(
+    public $default = [
         'transport' => 'Mail',
         'from' => 'you@localhost',
         //'charset' => 'utf-8',
         //'headerCharset' => 'utf-8',
-    );
+    ];
     
     public $gmail = [
+        'transport' => 'Smtp',
+        'from' => 'quirjohnincoy.work@gmail.com',
         'host' => 'smtp.gmail.com',
         'port' => 587,
+        'SMTPSecure' => 'starttls',
 		'ssl_verify_peer' => false,
 		'ssl_verify_host' => false,
+        'allow_self_signed' => true,
         'username' => 'quirjohnincoy.work@gmail.com',
         'password' => 'Yns!sre@l',
-        'transport' => 'Smtp',
         'tls' => true,
-        'from' => 'quirjohnincoy.work@gmail.com'
+        'client' => null,
+        'log' => false,
+        'charset' => 'utf-8',
+        'headerCharset' => 'utf-8',
     ];
 
-    public $smtp = array(
-        /* 'transport' => 'Smtp',
-        'from' => array('site@localhost' => 'My Site'),
-        'host' => 'localhost',
-        'port' => 25,
-        'timeout' => 30,
-        'username' => 'user',
-        'password' => 'secret',
-        'client' => null,
-        'log' => false, */
+    public $smtp = [
         'host' => 'smtp.mailtrap.io',
         'port' => 2525,
         'username' => '7198513de5519f',
@@ -71,9 +68,9 @@ class EmailConfig {
         'transport' => 'Smtp'
         //'charset' => 'utf-8',
         //'headerCharset' => 'utf-8',
-    );
+    ];
 
-    public $fast = array(
+    public $fast = [
         'from' => 'you@localhost',
         'sender' => null,
         'to' => null,
@@ -102,5 +99,5 @@ class EmailConfig {
         'log' => true,
         //'charset' => 'utf-8',
         //'headerCharset' => 'utf-8',
-    );
+    ];
 }
