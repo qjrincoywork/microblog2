@@ -39,7 +39,7 @@ class UsersController extends AppController {
         $this->paginate = [
             'joins' => [
                 [
-                    'table' => 'Follows',
+                    'table' => 'follows',
                     'alias' => 'Follow',
                     'type' => 'left',
                     'foreignKey' => false,
