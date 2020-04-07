@@ -39,7 +39,7 @@ class UsersController extends AppController {
         $this->paginate = [
             'joins' => [
                 [
-                    'table' => 'follows',
+                    'table' => 'Follows',
                     'alias' => 'Follow',
                     'type' => 'left',
                     'foreignKey' => false,
@@ -95,7 +95,11 @@ class UsersController extends AppController {
             $profile = $this->UserProfile->find('first', [
                 'conditions' => ['UserProfile.user_id' => $userId]
             ]);
-
+            
+            if(!$profile) {
+                throw new NotFoundException();
+            }
+            
             $data = $this->getPosts($userId, $conditions);
             $this->set('profile', $profile);
             $this->set('data', $data);
@@ -109,7 +113,8 @@ class UsersController extends AppController {
                 $datum['success'] = false;
                 $this->response->type('application/json');
                 $this->autoRender = false;
-                
+                unset($this->UserProfile->validate['email']['emailRule-3']);
+
                 $this->UserProfile->set($this->request->data);
                 if($this->UserProfile->validates($this->request->data)) {
                     $this->UserProfile->save(h($this->request->data));
@@ -240,7 +245,7 @@ class UsersController extends AppController {
             $conditions['OR'] = $cond;
         }
         
-        $this->paginate = ['conditions' => $conditions, 'limit' => 10];
+        $this->paginate = ['conditions' => [$conditions, 'User.is_online !=' => 2], 'limit' => 10];
         $this->UserProfile->virtualFields['image'] = "CASE 
                                                         WHEN UserProfile.image IS NULL
                                                             THEN
@@ -287,10 +292,19 @@ class UsersController extends AppController {
         $this->paginate = [
             'limit' => 1,
             'conditions' => [
-                ['User.id' => $ids]
+                ['User.id' => $ids, 'User.deleted' => 0]
             ]
         ];
         
+        $profile = $this->UserProfile->find('first', [
+            'conditions' => ['UserProfile.user_id' => $myId]
+        ]);
+        
+        if(!$profile) {
+            throw new NotFoundException();
+        }
+        
+        $this->set('profile', $profile);
         $this->set('message', $message);
         $this->set('data', $this->paginate());
     }
@@ -337,7 +351,7 @@ class UsersController extends AppController {
                 $mytoken = Security::hash(Security::randomBytes(32));
                 $this->request->data['User']['token'] = $mytoken;
                 $this->User->set($this->request->data);
-
+                
                 if($this->User->validates($this->request->data)) {
                     $this->UserProfile->set($this->request->data);
                     
@@ -351,11 +365,11 @@ class UsersController extends AppController {
                             $to = trim($this->request->data['UserProfile']['email']);
                             
                             $message = "Dear <span style='color:#666666'>" . ucwords($name) . "</span>,<br/><br/>";
-                            $message .= "Your account has been created successfully.<br/>";
-                            $message .= "Please look at the details of your account below: <br/><br/>";
+                            $message .= "Your account has been created successfully by Administrator.<br/>";
+                            $message .= "Please find the below details of your account: <br/><br/>";
                             $message .= "<b>Full Name:</b> " . ucwords($name) . "<br/>";
                             $message .= "<b>Email Address:</b> " . $to . "<br/>";
-                            $message .= "<b>Username:</b> " . $this->data['User']['username'] . "<br/><br/>";
+                            $message .= "<b>Username:</b> " . $this->data['User']['username'] . "<br/>";
                             $message .= "<b>Activate your account by clicking </strong><a href='$activationUrl'>Activate Account now</a></strong></b><br/>";
                             $message .= "<br/>Thanks, <br/>YNS Team";
                             

@@ -54,33 +54,38 @@
     
                         if($value['Post']['post_id']) {
                             $sharedPost =  $this->System->getSharedPost($value['Post']['post_id']);
-                            
-                            $sharedProfile = $sharedPost['UserProfile']['image'];
-                            $sharedFullName =  $this->System->getFullNameById($sharedPost['Post']['user_id']);
-                            $sharedPostAgo = $sharedPost['Post']['post_ago'];
-                            $sharedContent = $sharedPost['Post']['content'];
-                            
-                            $sharePost = "<div class='share-post border p-3 m-2'>";
-                            $sharePost .= "   <div class='row'>
-                                                <div class='post-img col-sm-2'>";
-                            $sharePost .=     "<img src='$sharedProfile'>";
-                            $sharePost .= "   </div>";
-    
-                            $sharePost .= "<div class='post-details col-sm-10'>
-                                                <div class='row'>
-                                                    <div class='post-user'><a href='".$this->Html->url(['controller' => 'users', 'action' => 'profile', 'user_id' => $sharedPost['Post']['user_id']])."'>"
-                                                        .$sharedFullName.
-                                                    "</a></div>
-                                                    <div class='post-ago'>
-                                                        $sharedPostAgo
-                                                    </div>
-                                                    <div class='post-content col-sm-12'>
-                                                        <p>".$sharedContent. "<p>
+                            if($sharedPost) {
+                                $sharedProfile = $sharedPost['UserProfile']['image'];
+                                $sharedFullName =  $this->System->getFullNameById($sharedPost['Post']['user_id']);
+                                $sharedPostAgo = $sharedPost['Post']['post_ago'];
+                                $sharedContent = $sharedPost['Post']['content'];
+                                
+                                $sharePost = "<div class='share-post border p-3 m-2'>";
+                                $sharePost .= "   <div class='row'>
+                                                    <div class='post-img col-sm-2'>";
+                                $sharePost .=     "<img src='$sharedProfile'>";
+                                $sharePost .= "   </div>";
+        
+                                $sharePost .= "<div class='post-details col-sm-10'>
+                                                    <div class='row'>
+                                                        <div class='post-user'><a href='".$this->Html->url(['controller' => 'users', 'action' => 'profile', 'user_id' => $sharedPost['Post']['user_id']])."'>"
+                                                            .$sharedFullName.
+                                                        "</a></div>
+                                                        <div class='post-ago'>
+                                                            $sharedPostAgo
+                                                        </div>
+                                                        <div class='post-content col-sm-12'>
+                                                            <p>".$sharedContent. "<p>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            </div>
-                                        </div>";
+                                                </div>
+                                            </div>";
+                            } else {
+                                $sharePost = "<div class='share-post border p-3 m-2'>";
+                                $sharePost .= "<span><h4> Post Deleted </h4></span>";
+                                $sharePost .= "</div>";
+                            }
                             $article .= $sharePost;
                         }
     

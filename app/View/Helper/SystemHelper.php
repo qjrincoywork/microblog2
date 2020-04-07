@@ -30,7 +30,7 @@ class SystemHelper extends AppHelper {
                                                 ELSE concat(datediff(now(), Post.created),' days ago')
                                             END";
         $data = $post->find('first', [
-            'conditions' => ['Post.id' => $postId]
+            'conditions' => ['Post.id' => $postId, 'Post.deleted' => 0]
         ]);
         
         return $data;

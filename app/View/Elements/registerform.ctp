@@ -10,28 +10,28 @@
                 <div class="row">
                     <div class="col-md-6">
                     <?php 
-                        echo $this->Form->input('username',
+                        echo $this->Form->input('User.username',
                                             ['class' => 'form-control form-control-sm',
                                                 'placeholder' => 'Enter username ...',
                                                 'id' => 'username',
                                                 'label'=>['text'=>'Username',
                                                         'for' => 'username',
                                                         'class'=>'col-form-label']]);
-                        echo $this->Form->input('password',
+                        echo $this->Form->input('User.password',
                                             ['class' => 'form-control form-control-sm',
                                             'placeholder' => 'Enter password ...',
                                             'id' => 'password',
                                                 'label'=>['text'=>'Password',
                                                         'for' => 'password',
                                                         'class'=>'col-form-label']]);
-                        echo $this->Form->input('UserProfile.email',
+                        echo $this->Form->input('User.confirm_password',
                                             ['class' => 'form-control form-control-sm',
-                                            'placeholder' => 'Enter email ...',
-                                            'id' => 'email',
-                                                'label'=>['text'=>'Email',
-                                                        'for' => 'email',
+                                            'type'=>'password',
+                                            'placeholder' => 'Enter Confirm Password ...',
+                                            'id' => 'confirm_password',
+                                                'label'=>['text'=>'Confirm Password',
+                                                        'for' => 'confirm_password',
                                                         'class'=>'col-form-label']]);
-
                         $options = ['' => 'Select Gender...', 0 => 'Female', 1 => 'Male'];
                         echo $this->Form->input('UserProfile.gender',
                                                 ['options' => $options,
@@ -76,6 +76,17 @@
                     ?>
                     </div>
                     
+                    <div class="col-md-12">
+                    <?php 
+                        echo $this->Form->input('UserProfile.email',
+                                            ['class' => 'form-control form-control-sm',
+                                            'placeholder' => 'Enter email ...',
+                                            'id' => 'email',
+                                                'label'=>['text'=>'Email',
+                                                        'for' => 'email',
+                                                        'class'=>'col-form-label']]);
+                    ?>
+                    </div>
                     <div class="col-md-12">
                     <?= $this->Form->end(['label' => 'register',
                                             'class' => 'register_user btn btn-primary form-control',

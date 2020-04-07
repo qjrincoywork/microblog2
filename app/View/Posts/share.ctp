@@ -1,6 +1,6 @@
 <?php
     $content = $data['Post']['content'];
-    $postId = $data['Post']['id'];
+    $postId = isset($data['Post']['post_id']) ? $data['Post']['post_id'] : $data['Post']['id'];
     $postAgo = $data['Post']['post_ago'];
     $profPic = $data['UserProfile']['image'];
     $userId = $this->Session->read('User')['id'];
@@ -45,7 +45,7 @@
                     </div>
                     <div class='post-content col-sm-12'>
                         <p>
-                            <?=$content?>
+                            <?=h($content)?>
                         </p>
                     </div>
                 </div>

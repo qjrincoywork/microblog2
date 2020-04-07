@@ -45,7 +45,7 @@
                 </div>
                 <div class='post-content col-sm-12'>
                     <p>
-                        <?=$content?>
+                        <?=h($content)?>
                     </p>
                 </div>
                 <?php

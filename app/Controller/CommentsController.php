@@ -55,6 +55,7 @@ class CommentsController extends AppController {
             $data = $this->Comment->find('first', [
                 'conditions' => ['Comment.id'=>$id]
             ]);
+            $data['Comment']['content'] = htmlspecialchars_decode($data['Comment']['content'], ENT_NOQUOTES);
             $this->set('data', $data);
         }
     }

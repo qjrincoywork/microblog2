@@ -117,6 +117,7 @@ class User extends AppModel {
         $data = $this->Post->find('first',[
             'conditions' => ['Post.id' => $postId]
         ]);
+        $data['Post']['content'] = htmlspecialchars_decode($data['Post']['content'], ENT_NOQUOTES);
         
         return $data;
     }

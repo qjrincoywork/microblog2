@@ -20,6 +20,9 @@
  */
 
 App::uses('Controller', 'Controller');
+App::uses('CakeEmail', 'Network/Email');
+App::uses('CakeTime', 'Utility');
+App::import('Helper', 'SystemHelper');
 
 /**
  * Application Controller
@@ -34,9 +37,9 @@ class AppController extends Controller {
     
     public $components = [
         'Flash',
-        'RequestHandler',
         'Session',
         'Email',
+        'RequestHandler',
         'Auth' => [
             'loginRedirect' => ['controller' => 'users', 'action' => 'dashboard'],
             'logoutRedirect' => ['controller' => 'users', 'action' => 'login'],
@@ -51,26 +54,12 @@ class AppController extends Controller {
             ]
         ]
     ];
-
+    
     public function beforeFilter() {
-        $this->Auth->allow('index', 'view');
+        if (empty($this->params['controller'])) {
+            return $this->redirect(['/']);
+        }
+        $this->set('url', '/');
+        $this->Auth->allow('login');
     }
-    // public $components = ['DebugKit.Toolbar'];
-    /* public $components = [
-        'Session',
-        'Auth' => [
-            'loginRedirect' => ['controller' => 'users', 'action' => 'index'],
-            'logoutRedirect' => ['controller' => 'users', 'action' => 'index'],
-            'authError' => "You Can't access that page",
-            'authorize' => ['Controller']
-        ],
-    ];
-
-    public function isAuthorized($user) {
-        return true;
-    }
-
-    public function beforeFilter() {
-        $this->Auth->allow('index', 'view');
-    } */
 }

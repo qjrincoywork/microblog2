@@ -4,7 +4,9 @@
 <aside class="menu-sidebar d-none d-lg-block border">
     <div class="menu-sidebar__content js-scrollbar1">
         <div class="image microblogLogo">
-            <img src='/img/microbloglogo.png'/>
+            <a href="<?= $this->Html->url('/users/dashboard')?>">
+                <img src='/img/microbloglogo.png'/>
+            </a>
         </div>
         <nav class="navbar-sidebar" id="navbar-sidebar">
             <ul class="list-unstyled navbar__list">

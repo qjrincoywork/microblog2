@@ -1,78 +1,18 @@
-<?php if(!empty($profile)):?>
-    <?php
-        $paginator = $this->Paginator;
-        $id = $this->Session->read('User')['id'];
-        $userId = $profile['User']['id'];
-        $myPost = $userId === $id ? true : false;
+<?= $this->element('profile'); ?>
 
-        $editPicHref = $this->Html->url(['controller' => 'users', 'action' => 'editPicture', 'id' => $userId]);
-        $picClass = $myPost ? 'update_picture' : '';
-        $editPicHref = $myPost ? "href='".$editPicHref."'" : '';
-
-        $joined = date(' M Y', strtotime($profile['User']['created']));
-        $myPic = $this->System->getUserPic($userId);
-        $myFullName = $this->System->getFullNameById($userId);
-    ?>
-    <div class="container-fluid border mt-3">
-        <div class="row">
-            <div class="wrapper col-sm-3 user-profile-pic">
-                <img type='button' src='<?=$myPic?>'class="mx-auto p-2">
-                <?php if($myPost):?>
-                <div class="overlay">
-                    <a href="#" class="icon" title='Change Picture'>
-                        <i class="<?=$picClass?> fas fa-camera" <?=$editPicHref?>></i>
-                    </a>
-                </div>
-                <?php endif;?>
-            </div>
-            <div class="col-sm-9 user-profile-details">
-                <?php
-                    if($myPost){
-                        $button = "<div class='follow-button col-sm-12 mt-3'>
-                                        <button href='".$this->Html->url(['controller' => 'users', 'action' => 'edit', 'id' => $userId])."' type='button' class='edit_profile btn-sm btn-outline-primary'>Edit profile</button>
-                                </div>";
-                    } else {
-                        $isFollowing = $this->System->isFollowing($id, $userId);
-                        $btnTitle = $isFollowing ? 'Unfollow' : 'Follow';
-                        $btnClass = $isFollowing ? 'unfollow_user btn-outline-danger' : 'follow_user btn-outline-primary';
-                        
-                        $button = "<div class='follow-button col-sm-12 mt-3'>
-                                        <button href='".$this->Html->url(['controller' => 'users', 'action' => 'follow'])."' type='button' class='".$btnClass." btn-sm' followingId='".$userId."'>".$btnTitle."</button>
-                                    </div>";
-                    }
-                    echo $button;
-                ?>    
-                <div class="row">
-                    <div class="col-sm-12 profile-fullname">
-                        <h3><?=$myFullName?></h3>
-                    </div>
-                    <div class="col-sm-12 row m-2">
-                        <div class="date-joined m-2">
-                            <h5 class="text-secondary"><i class="far fa-calendar-alt"></i> Joined <?= $joined ?></h5>
-                        </div>
-                        <div class="email m-2">
-                            <h5 class="text-secondary"><i class="fas fa-at"></i> <?= $profile['UserProfile']['email'] ?></h5>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 row">
-                        <div class="following p-2">
-                            <button href='<?=$this->Html->url(['controller' => 'users', 'action' => 'following', 'user_id' => $userId])?>' class="get_follow btn-sm btn-outline-primary">Following</button>
-                        </div>
-                        <div class="followers ml-5 p-2">
-                            <button href='<?=$this->Html->url(['controller' => 'users', 'action' => 'following', 'following_id' => $userId])?>' class="get_follow btn-sm btn-outline-primary">Followers</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-<?php endif;?>
+<?php
+    $id = $this->Session->read('User')['id'];
+    $userId = $profile['User']['id'];
+    
+    $profilePic = $this->System->getUserPic($userId);
+    $profileFullName = $this->System->getFullNameById($userId);
+?>
 <div id="profile-post-container">
     <?php
         if(isset($data)) {
+            $paginator = $this->Paginator;
             $article = '';
             foreach ($data as $key => $value) {
-                $gender = $value['UserProfile']['gender'];
                 $profilePic = $value['UserProfile']['image'];
                 $postAgo = $value['Post']['post_ago'];
                 $postId = $value['Post']['id'];
@@ -93,7 +33,7 @@
                 $article .= "<div class='post-container border'>";
                 $article .= "   <div class='row'>
                                     <div class='post-img col-sm-2'>";
-                $article .=     "<img src='$myPic'>";
+                $article .=     "<img src='$profilePic'>";
                 $article .= "   </div>";
 
                 $article .= "<div class='post-details col-sm-10'>
@@ -109,7 +49,7 @@
                                         </div>";
                             }
                 $article .=         "<div class='post-user'><a href='".$this->Html->url(['controller' => 'users', 'action' => 'profile', 'user_id' => $userId])."'>"
-                                        .$myFullName.
+                                        .$profileFullName.
                                     "</a></div>
                                     <div class='post-ago'>
                                         $postAgo
@@ -120,35 +60,40 @@
 
                             if($value['Post']['post_id']) {
                                 $sharedPost =  $this->System->getSharedPost($value['Post']['post_id']);
-
-                                $sharedFullName =  $this->System->getFullNameById($sharedPost['Post']['user_id']);
-                                $sharedProfile =  $this->System->getUserPic($sharedPost['Post']['user_id']);
-                                $sharedProfile = $sharedPost['UserProfile']['image'];
-                                $sharedPostAgo = $sharedPost['Post']['post_ago'];
-                                $sharedContent = $sharedPost['Post']['content'];
-                                
-                                $sharePost = "<div class='share-post border p-3 m-2'>";
-                                
-                                $sharePost .= "   <div class='row'>
-                                                    <div class='post-img col-sm-2'>";
-                                $sharePost .=     "<img src='$sharedProfile'>";
-                                $sharePost .= "   </div>";
-
-                                $sharePost .= "<div class='post-details col-sm-10'>
-                                                    <div class='row'>
-                                                        <div class='post-user'><a href='".$this->Html->url(['controller' => 'users', 'action' => 'profile', 'user_id' => $sharedPost['Post']['user_id']])."'>"
-                                                            .$sharedFullName.
-                                                        "</a></div>
-                                                        <div class='post-ago'>
-                                                            $sharedPostAgo
-                                                        </div>
-                                                        <div class='post-content col-sm-12'>
-                                                            <p>".$sharedContent. "<p>
+                                if($sharedPost) {
+                                    $sharedFullName =  $this->System->getFullNameById($sharedPost['Post']['user_id']);
+                                    $sharedProfile =  $this->System->getUserPic($sharedPost['Post']['user_id']);
+                                    $sharedProfile = $sharedPost['UserProfile']['image'];
+                                    $sharedPostAgo = $sharedPost['Post']['post_ago'];
+                                    $sharedContent = $sharedPost['Post']['content'];
+                                    
+                                    $sharePost = "<div class='share-post border p-3 m-2'>";
+                                    
+                                    $sharePost .= "   <div class='row'>
+                                                        <div class='post-img col-sm-2'>";
+                                    $sharePost .=     "<img src='$sharedProfile'>";
+                                    $sharePost .= "   </div>";
+    
+                                    $sharePost .= "<div class='post-details col-sm-10'>
+                                                        <div class='row'>
+                                                            <div class='post-user'><a href='".$this->Html->url(['controller' => 'users', 'action' => 'profile', 'user_id' => $sharedPost['Post']['user_id']])."'>"
+                                                                .$sharedFullName.
+                                                            "</a></div>
+                                                            <div class='post-ago'>
+                                                                $sharedPostAgo
+                                                            </div>
+                                                            <div class='post-content col-sm-12'>
+                                                                <p>".$sharedContent. "<p>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                </div>
-                                            </div>";
+                                                    </div>
+                                                </div>";
+                                } else {
+                                    $sharePost = "<div class='share-post border p-3 m-2'>";
+                                    $sharePost .= "<span><h4> Post Deleted </h4></span>";
+                                    $sharePost .= "</div>";
+                                }
                                 $article .= $sharePost;
                             }
 

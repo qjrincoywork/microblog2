@@ -14,10 +14,11 @@
         echo $this->Form->input('content', array(
                                 'label' => false,
                                 'id' => 'content',
-                                'value' => $data['Post']['content'],
+                                'value' => $content,
                                 'class' => 'mb-3 form-control ',
                                 'placeholder' => "Edit Content..."
         ));
+
         echo $this->Form->input('id', array(
                                 'label' => false,
                                 'type' => 'hidden',
@@ -40,7 +41,7 @@
                     </div>
                     <div class='post-content col-sm-12'>
                         <p>
-                            <?=$content?>
+                            <?=h($content)?>
                         </p>
                     </div>
                 </div>

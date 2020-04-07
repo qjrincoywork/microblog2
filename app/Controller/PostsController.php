@@ -37,7 +37,7 @@ class PostsController extends AppController {
                 $this->response->type('application/json');
                 $this->autoRender = false;
                 $this->Post->set($this->request->data);
-
+                
                 if(isset($this->request->data['Post']['post_id'])) {
                     unset($this->Post->validate['content']);
                     $this->Post->save(h($this->request->data));
