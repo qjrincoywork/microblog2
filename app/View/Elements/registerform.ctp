@@ -2,7 +2,7 @@
     <!-- <div class="card-header"><?= __('Sign up')?></div> -->
         <div class="card-body card-block">
             <div class="bd-note rounded">
-                <p><strong>NOTE:</strong> Please type the <strong>Passwords</strong> having 8 characters with At least 1 uppercase letter, lowercase  letters, numbers and 1 special character</p>
+                <p><strong>NOTE:</strong> Please type your <strong>Password</strong> having 8 characters with At least 1 uppercase letter, lowercase  letters, numbers and 1 special character</p>
             </div>
             <?= $this->Form->create('User',
                                     ['url' => 'register'],
