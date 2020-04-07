@@ -126,7 +126,7 @@ $(function () {
                         $("#mainContent").load(location.href);
                         break;
                     case "get_follow":
-                        $("#profile-post-container").html(data);
+                        $("#mainContent").html(data);
                         break;
                     default:
                         $("#mainContent").load(location.href);
