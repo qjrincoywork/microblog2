@@ -30,16 +30,16 @@ class User extends AppModel {
             'passwordRule-2' => [
                 'rule' => "/^(?=.*\d)(?=.*[@#\-_$%^&+=§!\?])(?=.*[a-z])(?=.*[A-Z])[0-9A-Za-z@#\-_$%^&+=§!\?]{8,20}$/",
                 'message' => 'The password does not meet the requirements'
-            ],
-            'passwordRule-3' => [
-                'rule' => "confirmPassword",
-                'message' => "Does not match with confirm password"
             ]
         ],
         'confirm_password' => [
             'confirm_passwordRule-1' => [
                 'rule' => 'notBlank',
                 'message' => 'Confirm password is required'
+            ],
+            'confirm_passwordRule-2' => [
+                'rule' => "confirmPassword",
+                'message' => "Does not match with password"
             ]
         ],
         'old_password' => [
