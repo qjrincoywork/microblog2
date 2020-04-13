@@ -106,54 +106,52 @@ class PostsController extends AppController {
     }
     
     public function edit() {
-        if($this->RequestHandler->isAjax()) {
-            if($this->request->is('post')) {
-                $username = $this->Session->read('User')['username'];
-                $datum['success'] = false;
-                $this->request->data['Post']['user_id'] = $this->Session->read('User')['id'];
-                $this->response->type('application/json');
-                $this->autoRender = false;
+        if($this->request->is('post')) {
+            $username = $this->Session->read('User')['username'];
+            $datum['success'] = false;
+            $this->request->data['Post']['user_id'] = $this->Session->read('User')['id'];
+            $this->response->type('application/json');
+            $this->autoRender = false;
+            
+            if($this->request->data['Post']['image'] == 'undefined') {
+                unset($this->request->data['Post']['image']);
+                $this->Post->set($this->request->data);
                 
-                if($this->request->data['Post']['image'] == 'undefined') {
-                    unset($this->request->data['Post']['image']);
-                    $this->Post->set($this->request->data);
+                if($this->Post->validates($this->request->data)) {
+                    $this->Post->save($this->request->data);
+                    $datum['success'] = true;
+                } else {
+                    $errors = $this->Post->validationErrors;
+                    $datum['error'] = $errors;
+                }
+            } else {
+                $this->Post->set($this->request->data);
+                if($this->Post->validates($this->request->data)) {
+                    $uploadFolder = "img/".$username;
                     
-                    if($this->Post->validates($this->request->data)) {
-                        $this->Post->save($this->request->data);
-                        $datum['success'] = true;
-                    } else {
-                        $errors = $this->Post->validationErrors;
-                        $datum['error'] = $errors;
+                    if(!file_exists($uploadFolder)) {
+                        mkdir($uploadFolder);
+                    }
+                    
+                    $path = $uploadFolder."/".$this->request->data['Post']['image']['name'];
+                    if(move_uploaded_file($this->request->data['Post']['image']['tmp_name'],
+                                            $path)) {
+                        $this->request->data['Post']['image'] = $path;
+                        
+                        if($this->Post->save($this->request->data)) {
+                            $datum['success'] = true;
+                        }
                     }
                 } else {
-                    $this->Post->set($this->request->data);
-                    if($this->Post->validates($this->request->data)) {
-                        $uploadFolder = "img/".$username;
-                        
-                        if(!file_exists($uploadFolder)) {
-                            mkdir($uploadFolder);
-                        }
-                        
-                        $path = $uploadFolder."/".$this->request->data['Post']['image']['name'];
-                        if(move_uploaded_file($this->request->data['Post']['image']['tmp_name'],
-                                              $path)) {
-                            $this->request->data['Post']['image'] = $path;
-                            
-                            if($this->Post->save($this->request->data)) {
-                                $datum['success'] = true;
-                            }
-                        }
-                    } else {
-                        $errors = $this->Post->validationErrors;
-                        $datum['error'] = $errors;
-                    }
+                    $errors = $this->Post->validationErrors;
+                    $datum['error'] = $errors;
                 }
-                return json_encode($datum);
             }
-            $postId = $this->request->params['named']['post_id'];
-            $data = $this->User->getPost($postId);
-            $this->set('data', $data);
+            return json_encode($datum);
         }
+        $postId = $this->request->params['named']['post_id'];
+        $data = $this->User->getPost($postId);
+        $this->set('data', $data);
     }
 
     public function delete() {
