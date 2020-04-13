@@ -8,12 +8,7 @@ class PostsController extends AppController {
         $this->layout = 'main';
         $this->Security->blackHoleCallback = 'blackhole';
         $this->Security->validatePost = false;
-        if(!in_array($this->request->params['action'], $this->Security->unlockedActions)) {
-            $this->Security->requireSecure();
-        }
-        if($this->request->is('ajax')) {
-            // $this->Security->unlockedActions = ['edit'];
-        }
+        $this->Security->requireSecure();
     }
     
     public function add() {
