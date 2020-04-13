@@ -8,7 +8,6 @@ class PostsController extends AppController {
         $this->layout = 'main';
         $this->Security->blackHoleCallback = 'blackhole';
         $this->Security->validatePost = false;
-        $this->Security->unlockedActions = ['edit','share'];
         if(!in_array($this->request->params['action'], $this->Security->unlockedActions)) {
             $this->Security->requireSecure();
         }
