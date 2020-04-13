@@ -35,13 +35,37 @@
  * The origin email. See CakeEmail::from() about the valid values
  */
 class EmailConfig {
-    public $default = [
+    /* public $default = array(
         'transport' => 'Mail',
-        'from' => 'you@localhost',
+        'from' => 'quirjohnincoy.work@gmail.com',
         //'charset' => 'utf-8',
         //'headerCharset' => 'utf-8',
-    ];
+    ); */
     
+    public $default = [
+        'host' => 'ssl://smtp.gmail.com',
+        'port' => 465,
+		'ssl_verify_peer' => false,
+		'ssl_verify_host' => false,
+        'username' => 'quirjohnincoy.work@gmail.com',
+        'password' => 'Yns!sre@l',
+        'transport' => 'Smtp',
+        'timeout' => 30,
+        'from' => 'quirjohnincoy.work@gmail.com',
+    ];
+    /* public $gmail = [
+        'transport' => 'Smtp',
+        'host' => 'smtp.gmail.com',
+        'port' => 587,
+        'emailFormat' => 'html', 
+        'username' => 'quirjohnincoy.work@gmail.com',
+        'password' => 'Yns!sre@l',
+        'tls' => true,
+        'from' => 'quirjohnincoy.work@gmail.com'
+        // 'host' => 'ssl://smtp.gmail.com',
+        // 'username' => 'quirjohnincoy.work@gmail.com',
+        // 'password' => 'Yns!sre@l',
+    ]; */
     public $gmail = [
         'transport' => 'Smtp',
         'from' => 'quirjohnincoy.work@gmail.com',
@@ -59,8 +83,25 @@ class EmailConfig {
         'charset' => 'utf-8',
         'headerCharset' => 'utf-8',
     ];
-
-    public $smtp = [
+    
+    /* public $default = array(
+        'log' => true,
+        // 'transport' => 'Mail',
+        // 'from' => 'you@localhost',
+        //'charset' => 'utf-8',
+        //'headerCharset' => 'utf-8',
+    ); */
+    
+    /* public $smtp = array(
+        // 'transport' => 'Smtp',
+        // 'from' => array('site@localhost' => 'My Site'),
+        // 'host' => 'localhost',
+        // 'port' => 25,
+        // 'timeout' => 30,
+        // 'username' => 'user',
+        // 'password' => 'secret',
+        // 'client' => null,
+        // 'log' => false,
         'host' => 'smtp.mailtrap.io',
         'port' => 2525,
         'username' => '7198513de5519f',
@@ -68,9 +109,9 @@ class EmailConfig {
         'transport' => 'Smtp'
         //'charset' => 'utf-8',
         //'headerCharset' => 'utf-8',
-    ];
+    ); */
 
-    public $fast = [
+    /* public $fast = array(
         'from' => 'you@localhost',
         'sender' => null,
         'to' => null,
@@ -93,11 +134,13 @@ class EmailConfig {
         'host' => 'localhost',
         'port' => 25,
         'timeout' => 30,
-        'username' => 'user',
-        'password' => 'secret',
+        'username' => 'quirjohnincoy.work@gmail.com',
+        'password' => 'Yns!sre@l',
+        // 'username' => 'user',
+        // 'password' => 'secret',
         'client' => null,
         'log' => true,
         //'charset' => 'utf-8',
         //'headerCharset' => 'utf-8',
-    ];
+    ); */
 }

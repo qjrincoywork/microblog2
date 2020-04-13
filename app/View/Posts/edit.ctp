@@ -12,21 +12,37 @@
                             ['inputDefaults'=> ['div' => 'form-group']]); ?>
     <?php
         echo $this->Form->input('content', array(
-                                'label' => false,
                                 'id' => 'content',
                                 'value' => $content,
+                                'label' => false,
                                 'class' => 'mb-3 form-control ',
                                 'placeholder' => "Edit Content..."
         ));
 
-        echo $this->Form->input('id', array(
+        echo $this->Form->hidden('id', array(
                                 'label' => false,
-                                'type' => 'hidden',
                                 'value' => $postId,
                                 'id' => 'id'
         ));
     ?>
-    <div class='container border p-3'>
+    
+    <?= $this->Form->input('image',
+                        ['class' => 'image_input form-control',
+                        'id' => 'image',
+                        'type' => 'file',
+                        "accept" => ".jpeg, .jpg, .png, .gif",
+                        'style' => 'display: none;',
+                        'label' => false,
+                        'value' => $data['Post']['image']]);?>
+
+    <div class="preview-image form-group">
+        <?php if($data['Post']['image']):?>
+            <label for="image" class="form-control-label"></label>
+            <img class="img-upload" src="/<?=$data['Post']['image']?>" alt="Preview Pic">
+        <?php endif;?>
+    </div>
+    
+    <div class='container border p-3 mt-2'>
         <div class='row'>
             <div class="col-sm-2">
                 <img src='<?=$profPic;?>'>
@@ -48,6 +64,8 @@
             </div>
         </div>
     </div>
+    <button class="edit_preview_image far fa-image" data-toggle='tooltip' data-placement='top' title='change image' style="float: left; font-size: 30px; color: #4c82a3;">
+    </button>
     <?= $this->Form->end(['label' => 'edit post',
                             'class' => 'edit_post btn btn-primary',
                             'div' => 'form-group mt-3',

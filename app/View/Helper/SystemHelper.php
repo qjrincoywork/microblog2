@@ -11,7 +11,7 @@ class SystemHelper extends AppHelper {
             'conditions' => ['User.id' => $id]
         ]);
         
-        $middleInitial = !isset($data['UserProfile']['middle_name']) ? $data['UserProfile']['middle_name'][0]."." : '';
+        $middleInitial = !empty($data['UserProfile']['middle_name']) ? substr($data['UserProfile']['middle_name'], 0, 1)."." : '';
         $fullName = ucwords($data['UserProfile']['first_name'].' '.$middleInitial.' '.$data['UserProfile']['last_name'].' '.$data['UserProfile']['suffix']);
         return $fullName;
     }

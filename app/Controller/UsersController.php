@@ -3,17 +3,19 @@ App::uses('AppController', 'Controller');
 
 class UsersController extends AppController {
     public $uses = ['User', 'UserProfile', 'Post', 'Follow'];
-    public $components = ['Paginator', 'RequestHandler'];
     
     public function beforeFilter() {
         parent::beforeFilter();
         $this->Auth->allow('register', 'activation', 'logout', 'testEmail');
         $this->layout = 'main';
         if($this->request->is('ajax')) {
+            // $this->Security->unlockedActions = ['edit'];
+            // $this->Security->requireSecure();
+            // $this->Security->validatePost = false;
             $this->layout = 'ajax';
         }
     }
-
+        
     public function getPosts($ids, $conditions = null) {
         $this->UserProfile->virtualFields['image'] = "CASE 
                                                         WHEN UserProfile.image IS NULL
@@ -30,7 +32,7 @@ class UsersController extends AppController {
                                                         THEN 'Just now'
                                                     WHEN Post.created between date_sub(now(), INTERVAL 60 minute) and now() 
                                                         THEN concat(minute(TIMEDIFF(now(), Post.created)), ' minutes ago')
-                                                    WHEN datediff(now(), Post.created) = 1 
+                                                    WHEN datediff(now(), Post.created) = 1
                                                         THEN 'Yesterday'
                                                     WHEN Post.created between date_sub(now(), INTERVAL 24 hour) and now() 
                                                         THEN concat(hour(TIMEDIFF(NOW(), Post.created)), ' hours ago')
@@ -114,8 +116,16 @@ class UsersController extends AppController {
                 $this->response->type('application/json');
                 $this->autoRender = false;
                 unset($this->UserProfile->validate['email']['emailRule-3']);
-
+                $this->request->data['UserProfile']['_Token']['key'] = $this->request->param('_Token.key');
+               
                 $this->UserProfile->set($this->request->data);
+                // $this->Security->unlockedFields = array('UserProfile.id');
+                // pr(Configure::read('Security.salt')); 
+                /* if (!isset($this->params['token']) || ($this->params['token'] != $this->params['_Token']['key'])) {
+                    $this->Security->blackHoleCallback = '__blackhole';
+                } else {
+                    // do delete
+                } */
                 if($this->UserProfile->validates($this->request->data)) {
                     $this->UserProfile->save(h($this->request->data));
                     $datum['success'] = true;
@@ -151,9 +161,9 @@ class UsersController extends AppController {
             $email->from(['quirjohnincoy.work@gmail.com' => 'Microblog'])
                     ->emailFormat('html')
                     ->to($to)
-                    ->subject($subject)
-                    ->send($message);
-            if($email->send()) {
+                    ->subject($subject);
+                    // ->send($message)
+            if($email->send($message)) {
                 echo "Email sent";
             } else {
                 echo "Email not sent";
@@ -166,7 +176,7 @@ class UsersController extends AppController {
     public function editPicture() {
         if($this->RequestHandler->isAjax()) {
             $datum['success'] = false;
-            if($this->request->is(['post', 'put'])) {
+            if($this->request->is('post')) {
                 $this->response->type('application/json');
                 $this->autoRender = false;
                 $profile = $this->request->data;
@@ -242,6 +252,7 @@ class UsersController extends AppController {
             $cond['UserProfile.email LIKE'] = "%" . trim($this->request->data['user']) . "%";
             $cond['UserProfile.middle_name LIKE'] = "%" . trim($this->request->data['user']) . "%";
             $cond['UserProfile.suffix LIKE'] = "%" . trim($this->request->data['user']) . "%";
+            $cond["CONCAT(UserProfile.first_name,' ',UserProfile.last_name) LIKE"] = "%" . trim($this->request->data['user']) . "%";
             $conditions['OR'] = $cond;
         }
         
@@ -263,7 +274,7 @@ class UsersController extends AppController {
     public function following() {
         $field = key($this->request->params['named']);
         $id = $this->request->params['named'][$field];
-        $myId = $this->Session->read('User')['id'];
+        
         if($field == 'user_id') {
             $conditions = ['Follow.'.$field => $id];
             $column = 'following_id';
@@ -290,21 +301,12 @@ class UsersController extends AppController {
                                                         ELSE concat('/',UserProfile.image)
                                                     END";
         $this->paginate = [
-            'limit' => 1,
+            'limit' => 10,
             'conditions' => [
                 ['User.id' => $ids, 'User.deleted' => 0]
             ]
         ];
         
-        $profile = $this->UserProfile->find('first', [
-            'conditions' => ['UserProfile.user_id' => $myId]
-        ]);
-        
-        if(!$profile) {
-            throw new NotFoundException();
-        }
-        
-        $this->set('profile', $profile);
         $this->set('message', $message);
         $this->set('data', $this->paginate());
     }
@@ -422,7 +424,7 @@ class UsersController extends AppController {
         $id = $user['User']['id'];
         
         if(isset($user['User']['is_online']) && $user['User']['is_online'] == 2) {
-            $this->User->set(['id' => $id, 'is_online' => 0, 'modified' => date('Y-m-d H:i:s')]);
+            $this->User->set(['id' => $id, 'is_online' => 0]);
             $this->User->save();
             $this->Flash->success(__('Account successfully verified!, You can now login'));
             $this->redirect(['controller' => 'users', 'action' => 'login']);

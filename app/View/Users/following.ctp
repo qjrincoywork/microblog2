@@ -1,4 +1,3 @@
-<?= $this->element('profile'); ?>
 <?php
     $paginator = $this->Paginator;
     $myId = $this->Session->read('User')['id'];

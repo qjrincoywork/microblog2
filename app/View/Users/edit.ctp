@@ -2,16 +2,14 @@
     <?= $this->Form->create('UserProfile',
                             ['url' => ['controller'=>'users','action'=>'edit']],
                             ['inputDefaults'=> ['div' => 'form-group']]); ?>
-    <?php 
+    <?php
+        // echo $this->Form->unlockField('UserProfile.id');
+        
         echo $this->Form->input('UserProfile.id',
                             ['class' => 'form-control',
-                            'placeholder' => 'Enter email ...',
                             'type' => 'hidden',
                             'id' => 'id',
-                            'value' => $data['UserProfile']['id'],
-                                'label'=>['text'=>'Email',
-                                        'for' => 'email',
-                                        'class'=>'col-form-label']]);
+                            'value' => $data['UserProfile']['id']]);
         echo $this->Form->input('UserProfile.email',
                             ['class' => 'form-control',
                             'placeholder' => 'Enter email ...',
@@ -20,7 +18,7 @@
                                 'label'=>['text'=>'Email',
                                         'for' => 'email',
                                         'class'=>'col-form-label']]);
-
+        
         $options = ['' => 'Select Gender...', 0 => 'Female', 1 => 'Male'];
         echo $this->Form->input('UserProfile.gender',
                                 ['options' => $options,

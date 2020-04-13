@@ -49,8 +49,13 @@
                                     $postAgo
                                 </div>
                                 <div class='post-content col-sm-12'>
-                                    <p>".$value['Post']['content']. "<p>
+                                    <p>".h($value['Post']['content']). "<p>
                                 </div>";
+                                if($value['Post']['image']) {
+                                    $article .=  "<div class='post-image col-sm-12'>
+                                                    <img src='/".$value['Post']['image']."'>
+                                                </div>";
+                                }
     
                         if($value['Post']['post_id']) {
                             $sharedPost =  $this->System->getSharedPost($value['Post']['post_id']);
@@ -76,11 +81,16 @@
                                                         </div>
                                                         <div class='post-content col-sm-12'>
                                                             <p>".$sharedContent. "<p>
-                                                        </div>
-                                                    </div>
+                                                        </div>";
+                                                        if($sharedPost['Post']['image']) {
+                                                            $sharePost .=  "<div class='sharedpost-image col-sm-12'>
+                                                                            <img src='/".$sharedPost['Post']['image']."'>
+                                                                        </div>";
+                                                        }
+                                $sharePost .=       "</div>
                                                 </div>
-                                                </div>
-                                            </div>";
+                                            </div>
+                                        </div>";
                             } else {
                                 $sharePost = "<div class='share-post border p-3 m-2'>";
                                 $sharePost .= "<span><h4> Post Deleted </h4></span>";

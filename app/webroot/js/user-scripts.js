@@ -42,7 +42,8 @@ $(function () {
     $("body").on("click", ".post_content, .like_post, .comment_post, .edit_comment, .delete_comment,"+
                           ".edit_post, .share_post, .delete_post, .restore_post,"+
                           ".follow_user, .unfollow_user, .edit_profile, .get_follow," +
-                          ".update_picture, .change_password", function (event) {
+                          ".update_picture, .change_password, .cancel_upload," + 
+                          ".preview_image, .edit_preview_image", function (event) {
         event.preventDefault();
         
         var form = $(this).closest("form").not(".form-group"),
@@ -50,11 +51,25 @@ $(function () {
             formId = form.attr('id'),
             className = $(this).attr("class").split(" ")[0],
             url = $(this).attr("href"),
+            csrfToken = $('meta[name="csrf-token"]').attr("content"),
             modal = false,
             me = this,
             fd = new FormData();
-
+            
         switch (className) {
+            case 'cancel_upload':
+                $(form).find('#preview-image').html('');
+                $(form).find("input[id='image']").val('');
+                return false;
+                break;
+            case 'preview_image':
+                $(form).find("input[id='image']").click();
+                return false;
+                break;
+            case 'edit_preview_image':
+                $(form).find("input[id='image']").click();
+                return false;
+                break;
             case 'like_post':
                 var postId = $(this).attr("postid");
                 data = {
@@ -89,16 +104,15 @@ $(function () {
                         type: "post",
                         url: action,
                         data: fd,
-                        cache: false,
-                        processData: false,
-                        contentType: false
+                        contentType: false,
+                        processData: false
                     });
                 }
                 break;
         }
-        console.log(action);
+        
         posting.done(function (data) {
-                console.log(data);
+            console.log(data);
             if(action == undefined) {
                 console.log(data);
                 if(modal) {
@@ -126,7 +140,7 @@ $(function () {
                         $("#mainContent").load(location.href);
                         break;
                     case "get_follow":
-                        $("#mainContent").html(data);
+                        $("#profile-post-container").html(data);
                         break;
                     default:
                         $("#mainContent").load(location.href);
@@ -153,10 +167,17 @@ $(function () {
                         notifAction = className.split("_")[0];
                         switch (className)
                         {
-                            case "update_picture":
-                                location.reload();
-                                break;
                             case "edit_profile":
+                            case "update_picture":
+                                fx.displayNotify(
+                                    title.charAt(0).toUpperCase() + title.slice(1),
+                                    "Successfully " + notifAction + suffix + ".",
+                                    "success"
+                                );
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 1500);
+                                break;
                             case "edit_post":
                             case "share_post":
                             case "comment_post":
@@ -188,6 +209,36 @@ $(function () {
             fx.displayNotify("User", error, "danger");
         });
     });
+    
+    $('body').on('change', '.image_input, .add_image_input', function (event) {
+        var form = $(this).closest("form").not(".form-group"),
+            className = $(this).attr("class").split(" ")[0],
+            fileType = this.files[0]['type'],
+            validImageTypes = ['image/gif', 'image/png', 'image/jpg', 'image/jpeg'],
+            reader = new FileReader();
+        if(className == 'image_input') {
+            if ($.inArray(fileType, validImageTypes) >= 0) {
+                fx.imageReadUrl(this);
+            } else {
+                fx.displayNotify("Invalid", "file input", "danger");
+            }
+        } else {
+            if (this.files && this.files[0]) {
+                if ($.inArray(fileType, validImageTypes) >= 0) {
+                    reader.onload = function (e) {
+                        image =  "<img src='"+ e.target.result +"' alt='your image'>" +
+                                    "<button href='#' class='cancel_upload' title='remove'>" +
+                                        "<i class='fas fa-times-circle'></i>" +
+                                    "</button>";
+                        $(form).find('.preview-image').html(image);
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                } else {
+                    fx.displayNotify("Invalid", "file input", "danger");
+                }
+            }
+        }
+    });
 
     $('#search').on('keypress',function(e) {
         if(e.which == 13) {
@@ -203,11 +254,8 @@ $(function () {
                 
                 posting = $.post(url, {user: value});
                 posting.done(function (data) {
-                    // window.location = url;
                     $("#mainContent").html(data);
-                    // console.log(data);
                 })
-                // window.location = url + "/user:"+value;
             }
         }
     });

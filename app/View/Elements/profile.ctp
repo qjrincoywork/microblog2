@@ -3,7 +3,6 @@
         $id = $this->Session->read('User')['id'];
         $userId = $profile['User']['id'];
         $myProfile = $userId === $id ? true : false;
-
         $editPicHref = $this->Html->url(['controller' => 'users', 'action' => 'editPicture', 'id' => $userId]);
         $picClass = $myProfile ? 'update_picture' : '';
         $editPicHref = $myProfile ? "href='".$editPicHref."'" : '';
@@ -49,7 +48,7 @@
                         <div class="date-joined m-2">
                             <h5 class="text-secondary"><i class="far fa-calendar-alt"></i> Joined <?= $joined ?></h5>
                         </div>
-                        <div class="email">
+                        <div class="email m-2">
                             <h5 class="text-secondary"><i class="fas fa-at"></i> <?= $profile['UserProfile']['email'] ?></h5>
                         </div>
                     </div>

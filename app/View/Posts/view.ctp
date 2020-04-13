@@ -48,6 +48,11 @@
                         <?=h($content)?>
                     </p>
                 </div>
+                <?php if($data['Post']['image']):?>
+                    <div class='post-image col-sm-12'>
+                        <img src="/<?=$data['Post']['image']?>">
+                    </div>
+                <?php endif;?>
                 <?php
                 if($data['Post']['post_id']) {
                     $sharedPost =  $this->System->getSharedPost($data['Post']['post_id']);
@@ -73,9 +78,14 @@
                                             </div>
                                             <div class='post-content col-sm-12'>
                                                 <p>".$sharedContent. "<p>
-                                            </div>
+                                            </div>";
+                            if($sharedPost['Post']['image']) {
+                                $sharePost .="<div class='sharedpost-image col-sm-12'>
+                                                <img src='/".$sharedPost['Post']['image']."'>
+                                            </div>";
+                            }
+                    $sharePost .=       "</div>
                                         </div>
-                                    </div>
                                     </div>
                                 </div>";
                                 
@@ -94,7 +104,7 @@
                 <span class='<?= ($isLiked ? 'fas' : 'far') ?> fa-heart' data-toggle='tooltip' data-placement='top' title='Like'> <?= (!empty($likeCount) ? $likeCount : '') ?></span>
             </button>
             <button href='<?=$this->Html->url(['controller' => 'posts', 'action' => 'share', 'post_id' => $postId])?>' class='share_post col-sm-4' postid='<?=$postId?>'>
-                <span class='<?= ($isShared ? 'fas' : 'far') ?> fa-share-square' data-toggle='tooltip' data-placement='top' title='Share'> <?= (!empty($shareCount) ? $likeCount : '') ?></span>
+                <span class='<?= ($isShared ? 'fas' : 'far') ?> fa-share-square' data-toggle='tooltip' data-placement='top' title='Share'> <?= (!empty($shareCount) ? $shareCount : '') ?></span>
             </button>
         </div>
     </div>

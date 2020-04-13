@@ -290,6 +290,7 @@ section {
         padding: 1rem 1rem 0 1rem;
     }
     .post-buttons {
+        padding: .30em;
         text-align: center;
     }
     .post-buttons span {
@@ -314,6 +315,14 @@ section {
     .post-content {
         word-break: break-all;
     }
+    .post-image {
+        height: auto;
+        max-width: 50%;
+    }
+    .sharedpost-image {
+        height: auto;
+        max-width: 50%;
+    }
     .post-user {
         margin-right: 1rem;
         color: #0d93e8;
@@ -331,6 +340,48 @@ section {
         transition: .3s ease;
         background-color:#79a5c18c;
     }
+    body .page-container .main-content .section__content .preview-image button {
+        position: absolute;
+        /* top: 3.25rem;
+        right: 14.5rem; */
+        top: 3.25rem;
+        right: 2.5rem;
+        font-size: 30px;
+        cursor: pointer;
+        color: #4c82a3;
+    }
+
+    body .page-container .modal .preview-image button {
+        position: absolute;
+        /* top: 3.25rem;
+        right: 14.5rem; */
+        top: 3.25rem;
+        right: 2em;
+        font-size: 30px;
+        cursor: pointer;
+        color: #4c82a3;
+    }
+
+    body .page-container .modal .preview-image img {
+        bottom: 0px;
+        height: auto;
+        max-width: 15rem;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        /* width: 50%; */
+    }
+
+    body .page-container .main-content .section__content .preview-image img {
+        bottom: 0px;
+        height: auto;
+        max-width: 15rem;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        /* width: 50%; */
+    }
+    
     .user-profile-pic:hover .overlay {
         opacity: 1;
         cursor: pointer;
@@ -412,6 +463,7 @@ section {
     padding-bottom: 2em;
     min-height: 100vh;
     background: #fff;
+    overflow: auto;
 }
 
 @media (max-width: 991px) {

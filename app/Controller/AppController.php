@@ -34,8 +34,9 @@ App::import('Helper', 'SystemHelper');
  * @link		https://book.cakephp.org/2.0/en/controllers.html#the-app-controller
  */
 class AppController extends Controller {
-    
     public $components = [
+        'Paginator',
+        'Security',
         'Flash',
         'Session',
         'Email',
@@ -50,7 +51,7 @@ class AppController extends Controller {
                         'log_username' => 'username',
                         'log_password' => 'password'
                     ],
-                ]   
+                ]
             ]
         ]
     ];
@@ -61,5 +62,9 @@ class AppController extends Controller {
         }
         $this->set('url', '/');
         $this->Auth->allow('login');
+    }
+
+    public function blackhole($type) {
+        $this->Session->setFlash(__('ERROR: %s',$type), 'flash/error');
     }
 }
