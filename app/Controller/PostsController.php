@@ -3,12 +3,41 @@ App::uses('AppController', 'Controller');
 
 class PostsController extends AppController {
     public $uses = ['User', 'UserProfile', 'Post', 'Follow', 'Comment'];
+    // public $components = ['Security'];
 
     public function beforeFilter() {
-        $this->layout = 'main';
         $this->Security->blackHoleCallback = 'blackhole';
-        $this->Security->validatePost = false;
-        $this->Security->requireSecure();
+        // $this->Security->validatePost = false;
+        // $this->Security->unlockedActions = ['edit', 'share'];
+        // $this->Security->requireAuth(['edit']);
+        // $this->Security->requireSecure();
+        $this->layout = 'main';
+    }
+
+    public function blackhole($type) {
+        switch ($type) {
+            case "csrf":
+                $this->Session->setFlash(__('The request has been black-holed (csrf)'));
+                // $datum['error'] = "The request has been black-holed (csrf)";
+                // $datum['error'] = "(csrf)";
+                // return json_encode($datum);
+                // $this->redirect(['controller' => 'users', 'action' => 'dashboard']);
+                // return $this->redirect($this->referer());
+                break;
+            case "auth":
+                $this->Flash->error(__("The request has been black-holed (auth)"));
+                // $this->Session->setFlash(__('The request has been black-holed (auth)'));
+                // $this->redirect(['controller' => 'users', 'action' => 'dashboard']);
+                // $datum['error'] = "The request has been black-holed (auth)";
+                // pr($datum);
+                // die('hit');
+                // return json_encode($datum);
+                // return $this->redirect($this->here);
+                break;
+            case "secure":
+                // return $this->redirect('https://'.env('SERVER_NAME').$this->here);
+                break;
+        }
     }
     
     public function add() {

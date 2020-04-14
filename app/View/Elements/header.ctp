@@ -55,7 +55,8 @@
                             <div class="account-dropdown js-dropdown">
                                 <div class="info clearfix">
                                     <div class="image">
-                                        <img src='<?=$myPic?>' />
+                                    <?php $myPic = ($this->here == "/users/changePassword/id:$myId" ? "/".$myPic : $myPic) ?>
+                                        <img src="<?=$myPic?>"/>
                                     </div>
                                     <div class="content">
                                         <h5 class="name">

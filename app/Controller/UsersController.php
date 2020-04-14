@@ -3,10 +3,14 @@ App::uses('AppController', 'Controller');
 
 class UsersController extends AppController {
     public $uses = ['User', 'UserProfile', 'Post', 'Follow'];
-    
+    // public $components = ['Security'];
+
     public function beforeFilter() {
-        parent::beforeFilter();
         $this->Auth->allow('register', 'activation', 'logout', 'testEmail');
+        $this->Security->blackHoleCallback = 'blackhole';
+        // $this->Security->validatePost = false;
+        // $this->Security->requireSecure();
+        // $this->Security->requireAuth();
         $this->layout = 'main';
         if($this->request->is('ajax')) {
             // $this->Security->unlockedActions = ['edit'];
@@ -15,13 +19,17 @@ class UsersController extends AppController {
             $this->layout = 'ajax';
         }
     }
-        
+
+    public function blackhole($type) {
+        // $this->redirect($this->referer());
+    }
+    
     public function getPosts($ids, $conditions = null) {
         $this->UserProfile->virtualFields['image'] = "CASE 
                                                         WHEN UserProfile.image IS NULL
                                                             THEN
                                                                 CASE
-                                                                WHEN UserProfile.gender != 1
+                                                                WHEN UserProfile.gender = 0
                                                                     THEN '/img/default_avatar_f.svg'
                                                                     ELSE '/img/default_avatar_m.svg'
                                                                 END
@@ -119,13 +127,6 @@ class UsersController extends AppController {
                 $this->request->data['UserProfile']['_Token']['key'] = $this->request->param('_Token.key');
                
                 $this->UserProfile->set($this->request->data);
-                // $this->Security->unlockedFields = array('UserProfile.id');
-                // pr(Configure::read('Security.salt')); 
-                /* if (!isset($this->params['token']) || ($this->params['token'] != $this->params['_Token']['key'])) {
-                    $this->Security->blackHoleCallback = '__blackhole';
-                } else {
-                    // do delete
-                } */
                 if($this->UserProfile->validates($this->request->data)) {
                     $this->UserProfile->save(h($this->request->data));
                     $datum['success'] = true;
@@ -181,12 +182,12 @@ class UsersController extends AppController {
                 $this->autoRender = false;
                 $profile = $this->request->data;
                 $username = $this->Session->read('User')['username'];
-                $this->UserProfile->set($profile);
                 if($profile['UserProfile']['image'] == 'undefined') {
                     $profile['UserProfile']['image'] = null;
                     $this->UserProfile->save($profile);
                     $datum['success'] = true;
                 } else {
+                    $this->UserProfile->set($profile);
                     if($this->UserProfile->validates($profile)) {
                         $uploadFolder = "img/".$username;
                         
@@ -437,7 +438,7 @@ class UsersController extends AppController {
     public function login() {
         $this->layout = 'default';
         /* if($this->Session->read('User')) {
-            return $this->redirect($this->Auth->redirectUrl());
+            return $this->redirect(['controller' => 'users', 'action' => 'dashboard']);
         } */
         
         if($this->request->is('post')) {

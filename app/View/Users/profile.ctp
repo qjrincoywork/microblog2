@@ -55,10 +55,10 @@
                                         $postAgo
                                     </div>
                                     <div class='post-content col-sm-12'>
-                                        <p>".h($value['Post']['content']). "<p>
+                                        <p>".h($value['Post']['content'], false). "<p>
                                     </div>";
                     if($value['Post']['image']) {
-                        $article .=  "<div class='post-image col-sm-12'>
+                        $article .=  "<div class='post-image col-sm-12 mb-2'>
                                         <img src='/".$value['Post']['image']."'>
                                     </div>";
                     }
@@ -91,7 +91,7 @@
                                                                 <p>".$sharedContent. "<p>
                                                             </div>";
                                             if($sharedPost['Post']['image']) {
-                                                $sharePost .=  "<div class='post-image col-sm-12'>
+                                                $sharePost .=  "<div class='post-image col-sm-12 mb-2'>
                                                                 <img src='/".$sharedPost['Post']['image']."'>
                                                             </div>";
                                             }

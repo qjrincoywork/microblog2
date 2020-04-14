@@ -36,6 +36,7 @@
         
         <div class="main-content" style=" height: 100%;">
             <div id="mainContent" class="section__content section__content--p30">
+                <?= $this->Flash->render() ?>
                 <?php echo $this->fetch('content'); ?>
             </div>
         </div>

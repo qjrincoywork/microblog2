@@ -3,7 +3,18 @@ App::uses('AppController', 'Controller');
 
 class CommentsController extends AppController {
     public $uses = ['User', 'Post', 'Comment'];
+    public function beforeFilter() {
+        $this->Security->blackHoleCallback = 'blackhole';
+        /* $this->Security->validatePost = false;
+        $this->Security->requireSecure(); */
+    }
     
+    public function blackhole($type) {
+        // $this->Flash->error(__($type));
+        $this->Session->setFlash('What are you doing!?');
+        // $this->redirect($this->referer());
+    }
+
     public function add() {
         if($this->RequestHandler->isAjax()) {
             if($this->request->is('post')) {
@@ -23,7 +34,7 @@ class CommentsController extends AppController {
                 
                 return json_encode($datum);
             }
-
+            
             $id = $this->request->params['named']['post_id'];
             $data = $this->User->getPost($id);
             $this->set('data', $data);

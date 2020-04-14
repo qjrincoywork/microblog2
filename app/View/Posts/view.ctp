@@ -49,7 +49,7 @@
                     </p>
                 </div>
                 <?php if($data['Post']['image']):?>
-                    <div class='post-image col-sm-12'>
+                    <div class='post-image col-sm-12 mb-2'>
                         <img src="/<?=$data['Post']['image']?>">
                     </div>
                 <?php endif;?>
@@ -61,7 +61,7 @@
                     $sharedPostAgo = $sharedPost['Post']['post_ago'];
                     $sharedContent = $sharedPost['Post']['content'];
                     
-                    $sharePost = "<div class='share-post border p-3 m-2'>";
+                    $sharePost = "<div class='share-post border p-3'>";
                    
                     $sharePost .= "   <div class='row'>
                                         <div class='post-img col-sm-2'>";

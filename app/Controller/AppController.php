@@ -36,11 +36,11 @@ App::import('Helper', 'SystemHelper');
 class AppController extends Controller {
     public $components = [
         'Paginator',
-        'Security',
         'Flash',
-        'Session',
         'Email',
         'RequestHandler',
+        'Security',
+        'Session',
         'Auth' => [
             'loginRedirect' => ['controller' => 'users', 'action' => 'dashboard'],
             'logoutRedirect' => ['controller' => 'users', 'action' => 'login'],
@@ -53,7 +53,7 @@ class AppController extends Controller {
                     ],
                 ]
             ]
-        ]
+        ],
     ];
     
     public function beforeFilter() {
@@ -62,9 +62,39 @@ class AppController extends Controller {
         }
         $this->set('url', '/');
         $this->Auth->allow('login');
+
+        /* $url = env('HTTP_HOST');
+        if (!isset($_SERVER['HTTPS']) && strpos($url, 'local') === false) {
+            $this->Security->requireSecure();
+            $this->Security->requireAuth();
+        } */
     }
 
-    public function blackhole($type) {
-        $this->Session->setFlash(__('ERROR: %s',$type), 'flash/error');
-    }
+    /* public function blackhole($type) {
+        // $this->Session->setFlash(__('ERROR: %s',$type), 'flash/error');
+        // $this->Session->setFlash('What are you doing!?');
+        
+        switch ($type) {
+            case "csrf":
+                $this->Session->setFlash(__('The request has been black-holed (csrf)'));
+                // $datum['error'] = "The request has been black-holed (csrf)";
+                // $datum['error'] = "(csrf)";
+                // return json_encode($datum);
+                // $this->redirect(['controller' => 'users', 'action' => 'dashboard']);
+                // return $this->redirect($this->referer());
+                break;
+            case "auth":
+                $this->Session->setFlash(__('The request has been black-holed (auth)'));
+                // $this->redirect(['controller' => 'users', 'action' => 'dashboard']);
+                // $datum['error'] = "The request has been black-holed (auth)";
+                // pr($datum);
+                // die('hit');
+                // return json_encode($datum);
+                // return $this->redirect($this->here);
+                break;
+            case "secure":
+                // return $this->redirect('https://'.env('SERVER_NAME').$this->here);
+                break;
+        }
+    } */
 }

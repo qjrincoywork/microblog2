@@ -118,7 +118,6 @@ class User extends AppModel {
             'conditions' => ['Post.id' => $postId]
         ]);
         $data['Post']['content'] = htmlspecialchars_decode($data['Post']['content'], ENT_NOQUOTES);
-        
         return $data;
     }
 

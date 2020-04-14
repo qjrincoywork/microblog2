@@ -75,7 +75,7 @@ class SystemHelper extends AppHelper {
                                                     WHEN UserProfile.image IS NULL
                                                     THEN
                                                         CASE
-                                                        WHEN UserProfile.gender != 1
+                                                        WHEN UserProfile.gender = 0
                                                             THEN '/img/default_avatar_f.svg'
                                                             ELSE '/img/default_avatar_m.svg'
                                                         END

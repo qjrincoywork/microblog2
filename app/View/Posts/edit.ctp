@@ -1,9 +1,10 @@
 <?php
     $content = $data['Post']['content'];
-    $postId = $data['Post']['id'];
+    $id = $data['Post']['id'];
     $postAgo = $data['Post']['post_ago'];
     $profPic = $data['UserProfile']['image'];
     $userId = $this->Session->read('User')['id'];
+    $postImage = $data['Post']['image'] ? "/".$data['Post']['image'] : '';
     $fullName = $this->System->getFullNameById($userId);
 ?>
 <div class="container p-3">
@@ -11,18 +12,20 @@
                             ['url' => ['controller' =>'posts', 'action' => 'edit']],
                             ['inputDefaults'=> ['div' => 'form-group']]); ?>
     <?php
+        // $this->Form->unlockField('id');
+        
+        echo $this->Form->hidden('id', array(
+                                'label' => false,
+                                'value' => $id,
+                                'id' => 'id'
+        ));
+
         echo $this->Form->input('content', array(
                                 'id' => 'content',
                                 'value' => $content,
                                 'label' => false,
                                 'class' => 'mb-3 form-control ',
                                 'placeholder' => "Edit Content..."
-        ));
-
-        echo $this->Form->hidden('id', array(
-                                'label' => false,
-                                'value' => $postId,
-                                'id' => 'id'
         ));
     ?>
     
@@ -36,10 +39,8 @@
                         'value' => $data['Post']['image']]);?>
 
     <div class="preview-image form-group">
-        <?php if($data['Post']['image']):?>
-            <label for="image" class="form-control-label"></label>
-            <img class="img-upload" src="/<?=$data['Post']['image']?>" alt="Preview Pic">
-        <?php endif;?>
+        <label for="image" class="form-control-label"></label>
+        <img class="img-upload" src="<?=$postImage?>">
     </div>
     
     <div class='container border p-3 mt-2'>

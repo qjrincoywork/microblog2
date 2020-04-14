@@ -1,8 +1,3 @@
-<?php
-    /* pr($data);
-    die('view'); */
-?>
-
 <div class="card-body card-block offset-md-3 mt-4">
     <div class="row">
         <div class="bd-note rounded">
@@ -14,37 +9,37 @@
                                     ['inputDefaults'=> ['div' => 'form-group']]); ?>
                                     
             <?php
-                    echo $this->Form->input('id', array(
-                        'label' => false,
-                        'type' => 'hidden',
-                        'value' => $data['User']['id'],
-                        'id' => 'id'
-                    ));
+                echo $this->Form->input('id', array(
+                    'label' => false,
+                    'type' => 'hidden',
+                    'value' => $data['User']['id'],
+                    'id' => 'id'
+                ));
 
-                    echo $this->Form->input('old_password',
+                echo $this->Form->input('old_password',
+                                    ['class' => 'form-control form-control-sm',
+                                    'type' => 'password',
+                                    'placeholder' => 'Enter Old Password ...',
+                                    'id' => 'old_password',
+                                        'label'=>['text'=>'Old Password',
+                                                'for' => 'old_password',
+                                                'class'=>'col-form-label']]);
+                echo $this->Form->input('password',
                                         ['class' => 'form-control form-control-sm',
                                         'type' => 'password',
-                                        'placeholder' => 'Enter Old Password ...',
-                                        'id' => 'old_password',
-                                            'label'=>['text'=>'Old Password',
-                                                    'for' => 'old_password',
+                                        'placeholder' => 'Enter New Password ...',
+                                        'id' => 'password',
+                                            'label'=>['text'=>'New Password',
+                                                    'for' => 'password',
                                                     'class'=>'col-form-label']]);
-                    echo $this->Form->input('password',
-                                            ['class' => 'form-control form-control-sm',
-                                            'type' => 'password',
-                                            'placeholder' => 'Enter New Password ...',
-                                            'id' => 'password',
-                                                'label'=>['text'=>'New Password',
-                                                        'for' => 'password',
-                                                        'class'=>'col-form-label']]);
-                    echo $this->Form->input('confirm_password',
-                                        ['class' => 'form-control form-control-sm',
-                                        'type' => 'password',
-                                        'placeholder' => 'Enter Confirm Password ...',
-                                        'id' => 'confirm_password',
-                                            'label'=>['text'=>'Confirm Password',
-                                                    'for' => 'confirm_password',
-                                                    'class'=>'col-form-label']]);
+                echo $this->Form->input('confirm_password',
+                                    ['class' => 'form-control form-control-sm',
+                                    'type' => 'password',
+                                    'placeholder' => 'Enter Confirm Password ...',
+                                    'id' => 'confirm_password',
+                                        'label'=>['text'=>'Confirm Password',
+                                                'for' => 'confirm_password',
+                                                'class'=>'col-form-label']]);
             ?>
             <?= $this->Form->end(['label' => 'Change Password',
                                     'type' => 'button',

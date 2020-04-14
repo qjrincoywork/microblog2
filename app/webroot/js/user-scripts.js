@@ -112,9 +112,15 @@ $(function () {
         }
         
         posting.done(function (data) {
-            console.log(data);
+            if(data.error) {
+                fx.displayNotify(
+                    "The request has been black-holed",
+                    data.error + ".",
+                    "danger"
+                );
+            }
+
             if(action == undefined) {
-                console.log(data);
                 if(modal) {
                     switch (className) {
                         /* case "comment_post":
@@ -147,6 +153,7 @@ $(function () {
                         break;
                 }
             } else {
+                console.log(data);
                 if(data.success) {
                     switch (className)
                     {
@@ -176,7 +183,7 @@ $(function () {
                                 );
                                 setTimeout(function () {
                                     location.reload();
-                                }, 1500);
+                                }, 1000);
                                 break;
                             case "edit_post":
                             case "share_post":
@@ -193,7 +200,7 @@ $(function () {
                                 );
                                 setTimeout(function () {
                                     $("#mainContent").load(location.href);
-                                }, 1500);
+                                }, 1000);
                                 break;
                             default:
                                 $("#mainContent").load(location.href);

@@ -3,7 +3,18 @@ App::uses('AppController', 'Controller');
 
 class LikesController extends AppController {
     public $uses = ['User', 'Post', 'Like'];
+    public function beforeFilter() {
+        $this->Security->blackHoleCallback = 'blackhole';
+        /* $this->Security->validatePost = false;
+        $this->Security->requireSecure(); */
+    }
 
+    public function blackhole($type) {
+        // $this->Flash->error(__($type));
+        $this->Session->setFlash('What are you doing!?');
+        // $this->redirect($this->referer());
+    }
+    
     public function add() {
         if($this->RequestHandler->isAjax()) {
             $this->response->type('application/json');
