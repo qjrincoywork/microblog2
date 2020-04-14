@@ -11,7 +11,6 @@ class LikesController extends AppController {
 
     public function blackhole($type) {
         // $this->Flash->error(__($type));
-        $this->Session->setFlash('What are you doing!?');
         // $this->redirect($this->referer());
     }
     

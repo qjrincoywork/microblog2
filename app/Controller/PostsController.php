@@ -15,7 +15,7 @@ class PostsController extends AppController {
     }
 
     public function blackhole($type) {
-        switch ($type) {
+        /* switch ($type) {
             case "csrf":
                 $this->Session->setFlash(__('The request has been black-holed (csrf)'));
                 // $datum['error'] = "The request has been black-holed (csrf)";
@@ -37,7 +37,7 @@ class PostsController extends AppController {
             case "secure":
                 // return $this->redirect('https://'.env('SERVER_NAME').$this->here);
                 break;
-        }
+        } */
     }
     
     public function add() {
