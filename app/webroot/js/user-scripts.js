@@ -112,14 +112,6 @@ $(function () {
         }
         
         posting.done(function (data) {
-            if(data.error) {
-                fx.displayNotify(
-                    "The request has been black-holed",
-                    data.error + ".",
-                    "danger"
-                );
-            }
-
             if(action == undefined) {
                 if(modal) {
                     switch (className) {
