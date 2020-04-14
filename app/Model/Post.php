@@ -1,5 +1,6 @@
 <?php
 App::uses('AppModel', 'Model');
+App::uses('CakeSession', 'Model/Datasource');
 
 class Post extends AppModel {
     public $actsAs = ['Containable'];
@@ -15,6 +16,12 @@ class Post extends AppModel {
     ];
 
     public $validate = [
+        'id' => [
+            'idRule-1' => [
+                'rule' => 'isMine',
+                'message' => 'Unable to process action'
+            ]
+        ],
         'content' => [
             'contentRule-1' => [
                 'rule' => ['maxLength', 140],
@@ -31,16 +38,6 @@ class Post extends AppModel {
                 'allowEmpty' => true,
                 'message'=>'Please input a valid image'
             ]
-            /* 'imageRule-1' => [
-                'rule' => ['mimeType', ['image/gif', 'image/png', 'image/jpg', 'image/jpeg']],
-                'allowEmpty' => true,
-                'message'=>'Please input a valid image'
-            ],
-            'imageRule-2' => [
-                'rule' => ['uploadError'],
-                'allowEmpty' => true,
-                'message' => "Image upload failed"
-            ] */
         ]
     ];
 
@@ -51,6 +48,19 @@ class Post extends AppModel {
                 return true;
             }
         } else {
+            return true;
+        }
+        return false;
+    }
+
+    public function isMine() {
+        $id = $this->data[$this->alias]['id'];
+        $userId = CakeSession::read('User.id');
+        $data = $this->find('first', [
+            'conditions' => [$this->alias.'.id' => $id, $this->alias.'.user_id' => $userId]
+        ]);
+        
+        if($data) {
             return true;
         }
         return false;

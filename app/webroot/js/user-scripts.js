@@ -1,6 +1,6 @@
-/* if(document.getElementById('flashMessage') !== null) {
+if(document.getElementById('flashMessage') !== null) {
     window.setTimeout("document.getElementById('flashMessage').style.display='none';", 3000);
-} */
+}
 
 var fxUser = {
     'UIHelper': function () {
@@ -112,6 +112,14 @@ $(function () {
         }
         
         posting.done(function (data) {
+            /* if(data.error) {
+                fx.displayNotify(
+                    "The request has been black-holed",
+                    data.error + ".",
+                    "danger"
+                );
+            } */
+
             if(action == undefined) {
                 if(modal) {
                     switch (className) {
@@ -145,7 +153,7 @@ $(function () {
                         break;
                 }
             } else {
-                console.log(data);
+                // console.log(data);
                 if(data.success) {
                     switch (className)
                     {

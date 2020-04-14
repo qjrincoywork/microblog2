@@ -12,20 +12,18 @@
                             ['url' => ['controller' =>'posts', 'action' => 'edit']],
                             ['inputDefaults'=> ['div' => 'form-group']]); ?>
     <?php
-        // $this->Form->unlockField('id');
-        
-        echo $this->Form->hidden('id', array(
-                                'label' => false,
-                                'value' => $id,
-                                'id' => 'id'
-        ));
-
         echo $this->Form->input('content', array(
                                 'id' => 'content',
                                 'value' => $content,
                                 'label' => false,
                                 'class' => 'mb-3 form-control ',
                                 'placeholder' => "Edit Content..."
+        ));
+        
+        echo $this->Form->hidden('id', array(
+                                'label' => false,
+                                'value' => $id,
+                                'id' => 'id'
         ));
     ?>
     
@@ -37,7 +35,7 @@
                         'style' => 'display: none;',
                         'label' => false,
                         'value' => $data['Post']['image']]);?>
-
+                        
     <div class="preview-image form-group">
         <label for="image" class="form-control-label"></label>
         <img class="img-upload" src="<?=$postImage?>">

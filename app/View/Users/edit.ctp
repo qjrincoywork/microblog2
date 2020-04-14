@@ -5,11 +5,11 @@
     <?php
         // echo $this->Form->unlockField('UserProfile.id');
         
-        echo $this->Form->input('UserProfile.id',
+        /* echo $this->Form->input('UserProfile.id',
                             ['class' => 'form-control',
                             'type' => 'hidden',
                             'id' => 'id',
-                            'value' => $data['UserProfile']['id']]);
+                            'value' => $data['UserProfile']['id']]); */
         echo $this->Form->input('UserProfile.email',
                             ['class' => 'form-control',
                             'placeholder' => 'Enter email ...',

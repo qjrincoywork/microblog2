@@ -3,13 +3,10 @@ App::uses('AppController', 'Controller');
 
 class PostsController extends AppController {
     public $uses = ['User', 'UserProfile', 'Post', 'Follow', 'Comment'];
-    // public $components = ['Security'];
 
     public function beforeFilter() {
         $this->Security->blackHoleCallback = 'blackhole';
-        // $this->Security->validatePost = false;
-        // $this->Security->unlockedActions = ['edit', 'share'];
-        // $this->Security->requireAuth(['edit']);
+        $this->Security->validatePost = false;
         // $this->Security->requireSecure();
         $this->layout = 'main';
     }
@@ -139,9 +136,10 @@ class PostsController extends AppController {
             $username = $this->Session->read('User')['username'];
             $datum['success'] = false;
             $this->request->data['Post']['user_id'] = $this->Session->read('User')['id'];
+            // $this->request->data['Post']['id'] = $postId;
             $this->response->type('application/json');
             $this->autoRender = false;
-            
+
             if($this->request->data['Post']['image'] == 'undefined') {
                 unset($this->request->data['Post']['image']);
                 $this->Post->set($this->request->data);

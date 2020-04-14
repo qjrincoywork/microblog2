@@ -5,6 +5,12 @@ class Comment extends AppModel {
     public $actsAs = ['Containable'];
     public $belongsTo = ['Post', 'User'];
     public $validate = [
+        'id' => [
+            'idRule-1' => [
+                'rule' => 'isMine',
+                'message' => 'Unable to process action'
+            ],
+        ],
         'content' => [
             'contentRule-1' => [
                 'rule' => ['maxLength', 140],
@@ -16,4 +22,17 @@ class Comment extends AppModel {
             ]
         ]
     ];
+    
+    public function isMine() {
+        $id = $this->data[$this->alias]['id'];
+        $userId = CakeSession::read('User.id');
+        $data = $this->find('first', [
+            'conditions' => [$this->alias.'.id' => $id, $this->alias.'.user_id' => $userId]
+        ]);
+        
+        if($data) {
+            return true;
+        }
+        return false;
+    }
 }

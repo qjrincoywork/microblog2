@@ -3,19 +3,14 @@ App::uses('AppController', 'Controller');
 
 class UsersController extends AppController {
     public $uses = ['User', 'UserProfile', 'Post', 'Follow'];
-    // public $components = ['Security'];
 
     public function beforeFilter() {
         $this->Auth->allow('register', 'activation', 'logout', 'testEmail');
         $this->Security->blackHoleCallback = 'blackhole';
         // $this->Security->validatePost = false;
         // $this->Security->requireSecure();
-        // $this->Security->requireAuth();
         $this->layout = 'main';
         if($this->request->is('ajax')) {
-            // $this->Security->unlockedActions = ['edit'];
-            // $this->Security->requireSecure();
-            // $this->Security->validatePost = false;
             $this->layout = 'ajax';
         }
     }
@@ -124,7 +119,7 @@ class UsersController extends AppController {
                 $this->response->type('application/json');
                 $this->autoRender = false;
                 unset($this->UserProfile->validate['email']['emailRule-3']);
-                $this->request->data['UserProfile']['_Token']['key'] = $this->request->param('_Token.key');
+                $this->request->data['UserProfile']['id'] = $this->Session->read('User')['id'];
                
                 $this->UserProfile->set($this->request->data);
                 if($this->UserProfile->validates($this->request->data)) {
@@ -180,6 +175,7 @@ class UsersController extends AppController {
             if($this->request->is('post')) {
                 $this->response->type('application/json');
                 $this->autoRender = false;
+                $this->request->data['UserProfile']['id'] = $this->Session->read('User')['id'];
                 $profile = $this->request->data;
                 $username = $this->Session->read('User')['username'];
                 if($profile['UserProfile']['image'] == 'undefined') {

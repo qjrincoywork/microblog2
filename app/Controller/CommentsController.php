@@ -18,7 +18,7 @@ class CommentsController extends AppController {
         if($this->RequestHandler->isAjax()) {
             if($this->request->is('post')) {
                 $datum['success'] = false;
-                
+                $this->request->data['Comment']['user_id'] = $this->Session->read('User')['id'];
                 $this->response->type('application/json');
                 $this->autoRender = false;
                 $this->Comment->set($this->request->data);
@@ -44,7 +44,7 @@ class CommentsController extends AppController {
         if($this->RequestHandler->isAjax()) {
             if($this->request->is('post')) {
                 $datum['success'] = false;
-
+                $this->request->data['Comment']['user_id'] = $this->Session->read('User')['id'];
                 $this->response->type('application/json');
                 $this->autoRender = false;
                 $this->Comment->set($this->request->data);
@@ -73,10 +73,18 @@ class CommentsController extends AppController {
     public function delete() {
         if($this->RequestHandler->isAjax()) {
             if($this->request->is('post')) {
+                $this->request->data['Comment']['user_id'] = $this->Session->read('User')['id'];
                 $datum['success'] = false;
                 $this->response->type('application/json');
                 $this->autoRender = false;
-                $this->Comment->delete($this->request->data['Comment']['id']);
+                
+                if($this->Comment->validates($this->request->data)) {
+                    $this->Comment->delete($this->request->data['Comment']['id']);
+                    $datum['success'] = true;
+                } else {
+                    $errors = $this->Comment->validationErrors;
+                    $datum['error'] = $errors;
+                }
                 $datum['success'] = true;
                 return json_encode($datum);
             }

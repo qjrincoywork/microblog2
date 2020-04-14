@@ -47,12 +47,7 @@
                                     'class' => 'mt-2 form-control ',
                                     'placeholder' => "Add Comment..."
             ));
-            echo $this->Form->input('user_id', array(
-                                    'label' => false,
-                                    'type' => 'hidden',
-                                    'value' => $userId,
-                                    'id' => 'user_id'
-            ));
+            
             echo $this->Form->input('post_id', array(
                                     'label' => false,
                                     'type' => 'hidden',

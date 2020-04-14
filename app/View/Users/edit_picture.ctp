@@ -4,13 +4,6 @@
                             ['url' => ['controller'=>'users','action'=>'editPicture']],
                             ['inputDefaults'=> ['div' => 'form-group']]); ?>
                             
-    <?= $this->Form->input('id', [
-                            'label' => false,
-                            'type' => 'hidden',
-                            'value' => $data['UserProfile']['id'],
-                            'id' => 'id']);
-    ?>
-                            
     <?= $this->Form->input('image',
                         ['class' => 'form-control',
                         'id' => 'image',
