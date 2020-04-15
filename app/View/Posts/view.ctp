@@ -6,14 +6,14 @@
     $sharePic = $data['UserProfile']['image'];
     $gender = $data['UserProfile']['gender'];
     $fullName = $this->System->getFullNameById($data['Post']['user_id']);
-    $userId = $this->Session->read('User')['id'];
+    $userId = $this->Session->read('Auth.User')['id'];
     $myPost = $data['Post']['user_id'] === $userId ? true : false;
     
     $isLiked = $this->System->postReaction($postId, $userId, 'Like');
     $isCommented = $this->System->postReaction($postId, $userId, 'Comment');
-    $isShared = $this->System->postReaction($postId, $userId, 'Share');
+    $isShared = $this->System->postReaction($postId, $userId, 'Post');
     
-    $shareCount = $this->System->getPostCount($postId);
+    $shareCount = $this->System->reactionCount($postId, 'Post');
     $commentCount = $this->System->reactionCount($postId, 'Comment');
     $likeCount = $this->System->reactionCount($postId, 'Like');
 
@@ -113,11 +113,13 @@
     if($comments) {
         $comment = '';
         foreach ($comments as $val) {
+            $myComment = $val['Comment']['user_id'] === $userId ? true : false;
+            
             $commenter = $this->System->getFullNameById($val['Comment']['user_id']);
             $commenterImg = $this->System->getUserPic($val['Comment']['user_id']);
+            
             $commentAgo = $val['Comment']['comment_ago'];
             $commentId = $val['Comment']['id'];
-            $myComment = $val['Comment']['user_id'] === $userId ? true : false;
 
             $commentClassListener = $val['Comment']['deleted'] ? 'restore_comment fas fa-recycle' : 'delete_comment fa fa-trash';
             $commentTitle = $val['Comment']['deleted'] ? 'Restore' : 'Delete';

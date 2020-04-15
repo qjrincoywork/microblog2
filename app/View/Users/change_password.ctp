@@ -9,13 +9,6 @@
                                     ['inputDefaults'=> ['div' => 'form-group']]); ?>
                                     
             <?php
-                echo $this->Form->input('id', array(
-                    'label' => false,
-                    'type' => 'hidden',
-                    'value' => $data['User']['id'],
-                    'id' => 'id'
-                ));
-
                 echo $this->Form->input('old_password',
                                     ['class' => 'form-control form-control-sm',
                                     'type' => 'password',

@@ -52,7 +52,6 @@ $(function () {
             formId = form.attr('id'),
             className = $(this).attr("class").split(" ")[0],
             url = $(this).attr("href"),
-            csrfToken = $('meta[name="csrf-token"]').attr("content"),
             modal = false,
             me = this,
             fd = new FormData();

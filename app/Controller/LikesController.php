@@ -4,7 +4,7 @@ App::uses('AppController', 'Controller');
 class LikesController extends AppController {
     public $uses = ['User', 'Post', 'Like'];
     public function beforeFilter() {
-        $this->Security->blackHoleCallback = 'blackhole';
+        // $this->Security->blackHoleCallback = 'blackhole';
         /* $this->Security->validatePost = false;
         $this->Security->requireSecure(); */
     }

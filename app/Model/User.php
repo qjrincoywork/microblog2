@@ -114,14 +114,12 @@ class User extends AppModel {
                                                     ELSE concat(datediff(now(), Post.created),' days ago')
                                                 END";
                                                 
-        $data = $this->Post->find('first',[
-            'conditions' => ['Post.id' => $postId]
-        ]);
+        $data = $this->Post->findById($postId);
         $data['Post']['content'] = htmlspecialchars_decode($data['Post']['content'], ENT_NOQUOTES);
         return $data;
     }
 
-    public function getUserPost($userId) 
+    public function getUserPost($userId)
     {
         $this->UserProfile->virtualFields['image'] = "CASE 
                                                         WHEN UserProfile.image IS NULL

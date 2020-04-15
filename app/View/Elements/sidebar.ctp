@@ -1,5 +1,5 @@
 <?php
-    $id = $this->Session->read('User')['id'];
+    $id = $this->Session->read('Auth.User')['id'];
 ?>
 <aside class="menu-sidebar d-none d-lg-block border">
     <div class="menu-sidebar__content js-scrollbar1">

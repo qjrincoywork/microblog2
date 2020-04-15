@@ -1,6 +1,6 @@
 <?php
     $paginator = $this->Paginator;
-    $myId = $this->Session->read('User')['id'];
+    $myId = $this->Session->read('Auth.User')['id'];
 ?>
 <?php
     if(!empty($data)) {

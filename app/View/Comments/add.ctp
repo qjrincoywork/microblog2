@@ -5,7 +5,7 @@
     $sharePic = $data['UserProfile']['image'];
     $gender = $data['UserProfile']['gender'];
     $fullName = $this->System->getFullNameById($data['User']['id']);
-    $userId = $this->Session->read('User')['id'];
+    $userId = $this->Session->read('Auth.User')['id'];
     $myPic = $this->System->getUserPic($userId);
 ?>
 <div class="container">

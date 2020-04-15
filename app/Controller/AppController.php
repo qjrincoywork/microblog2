@@ -39,7 +39,7 @@ class AppController extends Controller {
         'Flash',
         'Email',
         'RequestHandler',
-        'Security',
+        // 'Security',
         'Session',
         'Auth' => [
             'loginRedirect' => ['controller' => 'users', 'action' => 'dashboard'],
@@ -48,8 +48,10 @@ class AppController extends Controller {
                 'Form' => [
                     'passwordHasher' => 'Blowfish',
                     'fields' => [
-                        'log_username' => 'username',
-                        'log_password' => 'password'
+                        /* 'log_username' => 'username',
+                        'log_password' => 'password' */
+                        'username' => 'username',
+                        'password' => 'password'
                     ],
                 ]
             ]

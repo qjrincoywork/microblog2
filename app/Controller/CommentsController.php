@@ -4,7 +4,7 @@ App::uses('AppController', 'Controller');
 class CommentsController extends AppController {
     public $uses = ['User', 'Post', 'Comment'];
     public function beforeFilter() {
-        $this->Security->blackHoleCallback = 'blackhole';
+        // $this->Security->blackHoleCallback = 'blackhole';
         /* $this->Security->validatePost = false;
         $this->Security->requireSecure(); */
     }
@@ -42,7 +42,7 @@ class CommentsController extends AppController {
 
     public function edit() {
         if($this->RequestHandler->isAjax()) {
-            if($this->request->is('post')) {
+            if($this->request->is('put')) {
                 $datum['success'] = false;
                 $this->request->data['Comment']['user_id'] = $this->Session->read('User')['id'];
                 $this->response->type('application/json');
@@ -61,22 +61,19 @@ class CommentsController extends AppController {
             }
             
             $id = $this->request->params['named']['id'];
-            $data = $this->Comment->find('first', [
-                'conditions' => ['Comment.id'=>$id]
-            ]);
-            $data['Comment']['content'] = htmlspecialchars_decode($data['Comment']['content'], ENT_NOQUOTES);
-            $this->set('data', $data);
+            $this->request->data = $this->Comment->findById($id);
+            $this->request->data['Comment']['content'] = htmlspecialchars_decode($this->request->data['Comment']['content'], ENT_NOQUOTES);
         }
     }
 
     public function delete() {
         if($this->RequestHandler->isAjax()) {
-            if($this->request->is('post')) {
+            if($this->request->is('put')) {
                 $this->request->data['Comment']['user_id'] = $this->Session->read('User')['id'];
                 $datum['success'] = false;
                 $this->response->type('application/json');
                 $this->autoRender = false;
-                
+
                 if($this->Comment->validates($this->request->data)) {
                     $this->Comment->save($this->request->data);
                     $datum['success'] = true;
@@ -87,12 +84,9 @@ class CommentsController extends AppController {
                 
                 return json_encode($datum);
             }
-
+            
             $id = $this->request->params['named']['id'];
-            $data = $this->Comment->find('first',[
-                'conditions' => ['Comment.id' => $id]
-            ]);
-            $this->set('data', $data);
+            $this->request->data = $this->Comment->findById($id);
         }
     }
 }

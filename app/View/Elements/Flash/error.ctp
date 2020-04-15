@@ -3,4 +3,4 @@
         $message = h($message);
     }
 ?>
-<div class="alert alert-danger" id="flashMessage" onclick="this.classList.add('hidden');"><?= $message ?></div>
+<div class="alert alert-danger mt-2" id="flashMessage" onclick="this.classList.add('hidden');"><?= $message ?></div>

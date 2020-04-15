@@ -12,16 +12,16 @@
             $postId = $value['Post']['id'];
             $postUserId = $value['Post']['user_id'];
             $postFullName = $this->System->getFullNameById($postUserId);
-            $userId = $this->Session->read('User')['id'];
+            $userId = $this->Session->read('Auth.User')['id'];
             $myPost = $postUserId === $userId ? true : false ;
             
             $isLiked = $this->System->postReaction($postId, $userId, 'Like');
             $isCommented = $this->System->postReaction($postId, $userId, 'Comment');
-            $isShared = $this->System->postReaction($postId, $userId, 'Share');
+            $isShared = $this->System->postReaction($postId, $userId, 'Post');
             
             $likeCount = $this->System->reactionCount($postId, 'Like');
             $commentCount = $this->System->reactionCount($postId, 'Comment');
-            $shareCount = $this->System->getPostCount($postId);
+            $shareCount = $this->System->reactionCount($postId, 'Post');
             
             $article .= "<div class='post-container border'>";
             $article .= "   <div class='row'>

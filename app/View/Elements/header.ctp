@@ -1,7 +1,7 @@
 <?php
-  $gender = $this->Session->read('UserProfile')['gender'];
-  $email = $this->Session->read('UserProfile')['email'];
-  $myId = $this->Session->read('User')['id'];
+  $gender = $this->Session->read('Auth.User.UserProfile')['gender'];
+  $email = $this->Session->read('Auth.User.UserProfile')['email'];
+  $myId = $this->Session->read('Auth.User')['id'];
   $myPic = $this->System->getUserPic($myId);
   $myFullName = $this->System->getFullNameById($myId);
 ?>
@@ -67,7 +67,7 @@
                                 </div>
                                 <div class="account-dropdown__body">
                                     <div class="account-dropdown__item">
-                                        <a href="<?= $this->Html->url(['controller' => 'users', 'action' => 'changePassword', 'id' => $myId])?>">
+                                        <a href="<?= $this->Html->url(['controller' => 'users', 'action' => 'changePassword'])?>">
                                             <i class="fas fa-key"></i> Change Password
                                         </a>
                                         <a href="<?= $this->Html->url('/users/logout')?>">

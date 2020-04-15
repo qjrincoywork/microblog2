@@ -3,7 +3,6 @@
     $postId = isset($data['Post']['post_id']) ? $data['Post']['post_id'] : $data['Post']['id'];
     $postAgo = $data['Post']['post_ago'];
     $profPic = $data['UserProfile']['image'];
-    $userId = $this->Session->read('User')['id'];
     $fullName = $this->System->getFullNameById($data['User']['id']);
 ?>
 <div class="container p-3">
@@ -22,12 +21,6 @@
                                 'type' => 'hidden',
                                 'value' => $postId,
                                 'id' => 'post_id'
-        ));
-        echo $this->Form->input('user_id', array(
-                                'label' => false,
-                                'type' => 'hidden',
-                                'value' => $userId,
-                                'id' => 'user_id'
         ));
     ?>
     <div class='container border p-3'>

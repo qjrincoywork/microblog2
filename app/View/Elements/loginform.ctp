@@ -2,21 +2,23 @@
     <?= $this->Form->create('User', ['class' => 'form-inline', 
                                             'inputDefaults'=> ['div' => 'form-group']]); ?>
     <div class="row">
-        <?= $this->Form->input('log_username',
+        <?= $this->Form->input('username',
                             ['class' => 'form-control form-control-sm',
                                 'placeholder' => 'Enter username ...',
                                 'label'=>['text'=>'Username',
-                                        'for' => 'log_username',
+                                        'for' => 'username',
                                         'class'=>'col-form-label']
                             ]); ?>
-        <?= $this->Form->input('log_password',
+        <?= $this->Form->input('password',
                             ['class' => 'form-control form-control-sm',
                                 'placeholder' => 'Enter password ...',
                                 'type' => 'password',
                                 'label'=>['text'=>'Password',
-                                        'for' => 'log_password',
+                                        'for' => 'password',
                                         'class'=>'col-form-label']]);?>
+        
         <?= $this->Form->end(['label' => 'login',
+                             'type' => 'submit',
                             'class' => 'btn btn-secondary btn-sm',
                             'div' => 'form-group']); ?>
     </div>

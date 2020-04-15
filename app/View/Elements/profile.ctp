@@ -1,9 +1,9 @@
 <?php if(!empty($profile)):?>
     <?php
-        $id = $this->Session->read('User')['id'];
+        $id = $this->Session->read('Auth.User')['id'];
         $userId = $profile['User']['id'];
         $myProfile = $userId === $id ? true : false;
-        $editPicHref = $this->Html->url(['controller' => 'users', 'action' => 'editPicture', 'id' => $userId]);
+        $editPicHref = $this->Html->url(['controller' => 'users', 'action' => 'editPicture']);
         $picClass = $myProfile ? 'update_picture' : '';
         $editPicHref = $myProfile ? "href='".$editPicHref."'" : '';
 

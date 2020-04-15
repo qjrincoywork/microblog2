@@ -3,6 +3,7 @@ App::uses('AppController', 'Controller');
 
 class UsersController extends AppController {
     public $uses = ['User', 'UserProfile', 'Post', 'Follow'];
+    public $components = ['Security'];
 
     public function beforeFilter() {
         $this->Auth->allow('register', 'activation', 'logout', 'testEmail');
@@ -64,7 +65,7 @@ class UsersController extends AppController {
     }
     
     public function dashboard() {
-        $userId = $this->Session->read('User')['id'];
+        $userId = $this->Session->read('Auth.User')['id'];
         $ids = $this->Follow->find('list', [
                     'fields' => ['Follow.following_id'],
                     'conditions' => ['Follow.user_id' => $userId, 'Follow.deleted' => 0]
@@ -82,7 +83,7 @@ class UsersController extends AppController {
         }
         
         if(!empty($this->request->params['named']['user_id'])){
-            $id = $this->Session->read('User')['id'];
+            $id = $this->Session->read('Auth.User')['id'];
             $userId = $this->request->params['named']['user_id'];
             if($userId !== $id) {
                 $conditions = ['Post.deleted' => 0];
@@ -100,7 +101,7 @@ class UsersController extends AppController {
             $profile = $this->UserProfile->find('first', [
                 'conditions' => ['UserProfile.user_id' => $userId]
             ]);
-            
+
             if(!$profile) {
                 throw new NotFoundException();
             }
@@ -114,13 +115,16 @@ class UsersController extends AppController {
     
     public function edit() {
         if($this->RequestHandler->isAjax()) {
-            $id = $this->Session->read('User')['id'];
-            if($this->request->is('post')) {
+            $id = $this->Session->read('Auth.User')['id'];
+            if($this->request->is('put')) {
+                $this->request->data['UserProfile']['id'] = $id;
+                $this->request->data['UserProfile']['user_id'] = $id;
+
                 $datum['success'] = false;
                 $this->response->type('application/json');
                 $this->autoRender = false;
+
                 unset($this->UserProfile->validate['email']['emailRule-3']);
-                $this->request->data['UserProfile']['user_id'] = $id;
                
                 $this->UserProfile->set($this->request->data);
                 if($this->UserProfile->validates($this->request->data)) {
@@ -134,11 +138,9 @@ class UsersController extends AppController {
                 return json_encode($datum);
             }
             
-            $data = $this->UserProfile->find('first',[
+            $this->request->data = $this->UserProfile->find('first',[
                 'conditions' => ['UserProfile.user_id' => $id]
             ]);
-            
-            $this->set('data', $data);
         }
     }
     
@@ -172,19 +174,20 @@ class UsersController extends AppController {
 
     public function editPicture() {
         if($this->RequestHandler->isAjax()) {
+            $id = $this->Session->read('Auth.User')['id'];
             $datum['success'] = false;
-            if($this->request->is('post')) {
+            if($this->request->is('put')) {
                 $this->response->type('application/json');
                 $this->autoRender = false;
-                $this->request->data['UserProfile']['id'] = $this->Session->read('User')['id'];
+                $this->request->data['UserProfile']['id'] = $id;
+                $this->request->data['UserProfile']['user_id'] = $id;
                 $profile = $this->request->data;
-                $username = $this->Session->read('User')['username'];
+                $username = $this->Session->read('Auth.User')['username'];
                 if($profile['UserProfile']['image'] == 'undefined') {
                     $profile['UserProfile']['image'] = null;
                     $this->UserProfile->save($profile);
                     $datum['success'] = true;
                 } else {
-                    $this->UserProfile->set($profile);
                     if($this->UserProfile->validates($profile)) {
                         $uploadFolder = "img/".$username;
                         
@@ -196,7 +199,8 @@ class UsersController extends AppController {
                         if(move_uploaded_file($this->request->data['UserProfile']['image']['tmp_name'],
                                               $path)) {
                             $profile['UserProfile']['image'] = $path;
-                            if($this->UserProfile->save($profile)) {
+                            $this->UserProfile->set($profile);
+                            if($this->UserProfile->save()) {
                                 $datum['success'] = true;
                             }
                         }
@@ -207,21 +211,17 @@ class UsersController extends AppController {
                 }
                 return json_encode($datum);
             }
-            $id = $this->request->params['named']['id'];
-            $data = $this->UserProfile->find('first',[
-                'conditions' => ['User.id' => $id]
-            ]);
-            
-            $this->set('data', $data);
+            $this->request->data = $this->User->findById($id);
         }
     }
 
     public function changePassword() {
-        if($this->request->is('post')) {
+        $id = $this->Session->read('Auth.User')['id'];
+        if($this->request->is('put')) {
             $datum['success'] = false;
             $this->response->type('application/json');
             $this->autoRender = false;
-            
+            $this->request->data['User']['id'] = $id;
             $this->User->set($this->request->data);
             if($this->User->validates($this->request->data)) {
                 $this->User->save(h($this->request->data));
@@ -233,12 +233,7 @@ class UsersController extends AppController {
             
             return json_encode($datum);
         }
-        $id = $this->request->params['named']['id'];
-        $data = $this->User->find('first',[
-            'conditions' => ['User.id' => $id]
-        ]);
-        
-        $this->set('data', $data);
+        $this->request->data = $this->User->findById($id);
     }
 
     public function search() {
@@ -315,7 +310,7 @@ class UsersController extends AppController {
             $this->autoRender = false;
             $datum['success'] = false;
             
-            $follow['Follow']['user_id'] = $this->Session->read('User')['id'];
+            $follow['Follow']['user_id'] = $this->Session->read('Auth.User')['id'];
             $follow['Follow']['following_id'] = $this->request->data['following_id'];
             
             $exists = $this->Follow->find('first', [
@@ -434,14 +429,14 @@ class UsersController extends AppController {
     
     public function login() {
         $this->layout = 'default';
-        /* if($this->Session->read('User')) {
+        /* if($this->Session->read('Auth.User')) {
             return $this->redirect(['controller' => 'users', 'action' => 'dashboard']);
         } */
         
         if($this->request->is('post')) {
             $user = $this->User->find('first', [
                 'conditions' => [
-                        ['User.username' => $this->request->data['User']['log_username']]
+                        ['User.username' => $this->request->data['User']['username']]
                     ]
             ]);
             
@@ -456,34 +451,25 @@ class UsersController extends AppController {
                         $this->Flash->error(__('Your account has been deactivated, Please Contact Admin.'));
                         break;
                     default:
-                        $auth = password_verify($this->request->data['User']['log_password'] , $user['User']['password']);
-                        if(!$auth) {
+                        if ($this->Auth->login()) {
+                            $this->User->set(['id' => $user['User']['id'],
+                                            'is_online' => 1,
+                                            'attempts' => 0]);
+                            $this->User->save();
+                            return $this->redirect($this->Auth->redirectUrl("/users/dashboard"));
+                        } else {
                             if($user['User']['attempts'] <= 4) {
                                 $attempt = $user['User']['attempts'] + 1; 
                                 $this->User->set(['id' => $user['User']['id'],
-                                                'attempts' => $attempt,
-                                                'modified' => date('Y-m-d H:i:s')]);
+                                                'attempts' => $attempt]);
                                 $this->User->save();
                                 $this->Flash->error(__('Invalid username or password, try again'));
                             } else {
                                 $this->User->set(['id' => $user['User']['id'],
-                                                'is_online' => 3,
-                                                'modified' => date('Y-m-d H:i:s')]);
+                                                    'is_online' => 3]);
                                 $this->User->save();
                                 $this->Flash->error(__('Your account has been deactivated, Please Contact Admin.'));
                             }
-                        } else {
-                            $this->User->set(['id' => $user['User']['id'],
-                                            'is_online' => 1,
-                                            'attempts' => 0,
-                                            'modified' => date('Y-m-d H:i:s')]);
-                            $this->User->save();
-                            $this->Session->write($user);
-                            
-                            unset($this->request->data['User']['log_password']);
-                            
-                            $this->Auth->login($this->request->data);
-                            return $this->redirect($this->Auth->redirectUrl("/users/dashboard"));
                         }
                         break;
                 }
@@ -492,8 +478,8 @@ class UsersController extends AppController {
     }
     
     public function logout() {
-        if($this->Session->read('User')) {
-            $id = $this->Session->read('User')['id'];
+        if($this->Session->read('Auth.User')) {
+            $id = $this->Session->read('Auth.User')['id'];
             $this->User->set(['id' => $id,
                             'is_online' => 0,
                             'modified' => date('Y-m-d H:i:s')]);

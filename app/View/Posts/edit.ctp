@@ -1,10 +1,10 @@
 <?php
-    $content = $data['Post']['content'];
-    $id = $data['Post']['id'];
-    $postAgo = $data['Post']['post_ago'];
-    $profPic = $data['UserProfile']['image'];
+    $content = $this->data['Post']['content'];
+    $id = $this->data['Post']['id'];
+    $postAgo = $this->data['Post']['post_ago'];
+    $profPic = $this->data['UserProfile']['image'];
     $userId = $this->Session->read('User')['id'];
-    $postImage = $data['Post']['image'] ? "/".$data['Post']['image'] : '';
+    $postImage = !empty($this->data['Post']['image']) ? "/".$this->data['Post']['image'] : '';
     $fullName = $this->System->getFullNameById($userId);
 ?>
 <div class="container p-3">
@@ -14,7 +14,6 @@
     <?php
         echo $this->Form->input('content', array(
                                 'id' => 'content',
-                                'value' => $content,
                                 'label' => false,
                                 'class' => 'mb-3 form-control ',
                                 'placeholder' => "Edit Content..."
@@ -22,7 +21,6 @@
         
         echo $this->Form->hidden('id', array(
                                 'label' => false,
-                                'value' => $id,
                                 'id' => 'id'
         ));
     ?>
@@ -33,8 +31,7 @@
                         'type' => 'file',
                         "accept" => ".jpeg, .jpg, .png, .gif",
                         'style' => 'display: none;',
-                        'label' => false,
-                        'value' => $data['Post']['image']]);?>
+                        'label' => false]);?>
                         
     <div class="preview-image form-group">
         <label for="image" class="form-control-label"></label>
@@ -68,5 +65,6 @@
     <?= $this->Form->end(['label' => 'edit post',
                             'class' => 'edit_post btn btn-primary',
                             'div' => 'form-group mt-3',
+                            'type' => 'submit',
                             'style' => 'float: right']); ?>
 </div>

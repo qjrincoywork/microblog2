@@ -1,7 +1,7 @@
 <?= $this->element('profile'); ?>
 
 <?php
-    $id = $this->Session->read('User')['id'];
+    $id = $this->Session->read('Auth.User')['id'];
     $userId = $profile['User']['id'];
     
     $profilePic = $this->System->getUserPic($userId);
@@ -21,12 +21,12 @@
                 
                 $isLiked = $this->System->postReaction($postId, $id, 'Like');
                 $isCommented = $this->System->postReaction($postId, $id, 'Comment');
-                $isShared = $this->System->postReaction($postId, $id, 'Share');
+                $isShared = $this->System->postReaction($postId, $id, 'Post');
                 
                 $likeCount = $this->System->reactionCount($postId, 'Like');
                 $commentCount = $this->System->reactionCount($postId, 'Comment');
-                $shareCount = $this->System->getPostCount($postId);
-
+                $shareCount = $this->System->reactionCount($postId, 'Post');
+                
                 $classListener = $value['Post']['deleted'] ? 'restore_post fas fa-recycle' : 'delete_post fa fa-trash';
                 $title = $value['Post']['deleted'] ? 'Restore' : 'Delete';
                 

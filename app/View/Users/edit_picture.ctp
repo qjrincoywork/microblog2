@@ -8,7 +8,6 @@
                         ['class' => 'form-control',
                         'id' => 'image',
                         'type' => 'file',
-                        'value' => $data['UserProfile']['image'],
                             'label'=>['text'=>'Upload Image',
                                     'for' => 'image',
                                     'class'=>'col-form-label']]);?>

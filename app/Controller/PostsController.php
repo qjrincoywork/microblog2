@@ -3,21 +3,19 @@ App::uses('AppController', 'Controller');
 
 class PostsController extends AppController {
     public $uses = ['User', 'UserProfile', 'Post', 'Follow', 'Comment'];
+    public $components = ['Security'];
 
     public function beforeFilter() {
         $this->Security->blackHoleCallback = 'blackhole';
-        $this->Security->validatePost = false;
-        // $this->Security->requireSecure();
+        // $this->Security->validatePost = false;
+        // $this->Security->requireAuth();
         $this->layout = 'main';
     }
 
     public function blackhole($type) {
-        /* switch ($type) {
+        switch ($type) {
             case "csrf":
                 $this->Session->setFlash(__('The request has been black-holed (csrf)'));
-                // $datum['error'] = "The request has been black-holed (csrf)";
-                // $datum['error'] = "(csrf)";
-                // return json_encode($datum);
                 // $this->redirect(['controller' => 'users', 'action' => 'dashboard']);
                 // return $this->redirect($this->referer());
                 break;
@@ -25,16 +23,12 @@ class PostsController extends AppController {
                 $this->Flash->error(__("The request has been black-holed (auth)"));
                 // $this->Session->setFlash(__('The request has been black-holed (auth)'));
                 // $this->redirect(['controller' => 'users', 'action' => 'dashboard']);
-                // $datum['error'] = "The request has been black-holed (auth)";
-                // pr($datum);
-                // die('hit');
-                // return json_encode($datum);
                 // return $this->redirect($this->here);
                 break;
             case "secure":
                 // return $this->redirect('https://'.env('SERVER_NAME').$this->here);
                 break;
-        } */
+        }
     }
     
     public function add() {
@@ -49,7 +43,7 @@ class PostsController extends AppController {
                 $this->request->data['Post']['image'] = null;
                 
                 if($this->Post->validates($this->request->data)) {
-                    $this->Post->save($this->request->data);
+                    $this->Post->save($this->request->data); 
                     $datum['success'] = true;
                 } else {
                     $errors = $this->Post->validationErrors;
@@ -85,7 +79,7 @@ class PostsController extends AppController {
         if($this->RequestHandler->isAjax()) {
             if($this->request->is('post')) {
                 $datum['success'] = false;
-                
+                $this->request->data['Post']['user_id'] = $this->Session->read('User')['id'];
                 $this->response->type('application/json');
                 $this->autoRender = false;
                 $this->Post->set($this->request->data);
@@ -122,7 +116,7 @@ class PostsController extends AppController {
                                                     END";
         $this->paginate = [
             'limit' => 3,
-            'conditions' => ['Comment.post_id' => $id, 'Comment.deleted' => 0],
+            'conditions' => ['Comment.post_id' => $id],
             'order' => [
                 'Comment.created'
             ]
@@ -132,19 +126,29 @@ class PostsController extends AppController {
     }
     
     public function edit() {
-        if($this->request->is('post')) {
+        if (empty($this->request->data)) {
+            $postId = $this->request->params['named']['post_id'];
+            $data = $this->User->getPost($postId);
+            $this->request->data = $data;
+        }
+        
+        if($this->request->is('put')) {
             $username = $this->Session->read('User')['username'];
             $datum['success'] = false;
             $this->request->data['Post']['user_id'] = $this->Session->read('User')['id'];
             $this->response->type('application/json');
             $this->autoRender = false;
-
+            
+            /* pr($this->request->data);
+            die('hits'); */
             if($this->request->data['Post']['image'] == 'undefined') {
                 unset($this->request->data['Post']['image']);
                 $this->Post->set($this->request->data);
                 
                 if($this->Post->validates($this->request->data)) {
-                    $this->Post->save($this->request->data);
+                    $this->Post->save(h($this->request->data));
+                    // $this->Flash->success(__("Post Successfully edited."));
+                    // return $this->redirect($this->referer());
                     $datum['success'] = true;
                 } else {
                     $errors = $this->Post->validationErrors;
@@ -154,17 +158,39 @@ class PostsController extends AppController {
                 $this->Post->set($this->request->data);
                 if($this->Post->validates($this->request->data)) {
                     $uploadFolder = "img/".$username;
-                    
                     if(!file_exists($uploadFolder)) {
                         mkdir($uploadFolder);
                     }
+                    /* $file = $this->request->data['Post']['image'];
+                    $path = $uploadFolder."/".$file;
+                    $ext = substr(strtolower(strrchr($file, '.')), 1);
+                    $allowedImages = ['jpg', 'jpeg', 'gif', 'png'];
                     
+                    if(in_array($ext, $allowedImages))
+                    {
+                        pr($file);
+                        pr($path);
+                        die('hits');
+                        if(move_uploaded_file($file, $path)) {
+                            $this->request->data['Post']['image'] = $path;
+                            if($this->Post->save($this->request->data)) {
+                                $this->Flash->success(__("Post Successfully edited."));
+                                return $this->redirect($this->referer());
+                                // $datum['success'] = true;
+                            }
+                        }
+                    } */
+                    /* if(!file_exists($uploadFolder)) {
+                        mkdir($uploadFolder);
+                    } */
                     $path = $uploadFolder."/".$this->request->data['Post']['image']['name'];
                     if(move_uploaded_file($this->request->data['Post']['image']['tmp_name'],
                                             $path)) {
                         $this->request->data['Post']['image'] = $path;
                         
                         if($this->Post->save($this->request->data)) {
+                            // $this->Flash->success(__("Post Successfully edited."));
+                            // return $this->redirect($this->referer());
                             $datum['success'] = true;
                         }
                     }
@@ -175,9 +201,6 @@ class PostsController extends AppController {
             }
             return json_encode($datum);
         }
-        $postId = $this->request->params['named']['post_id'];
-        $data = $this->User->getPost($postId);
-        $this->set('data', $data);
     }
 
     public function delete() {

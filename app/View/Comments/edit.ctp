@@ -1,7 +1,3 @@
-<?php
-    $id = $data['Comment']['id'];
-    $content = $data['Comment']['content'];
-?>
 <div class="container p-3">
     <?= $this->Form->create('Comment',
                             ['url' => ['controller' =>'comments', 'action' => 'edit']],
@@ -11,14 +7,12 @@
                                 'label' => false,
                                 'id' => 'content',
                                 'type' => 'text',
-                                'value' => $data['Comment']['content'],
                                 'class' => 'mb-3 form-control ',
                                 'placeholder' => "Edit Content..."
         ));
         echo $this->Form->input('id', array(
                                 'label' => false,
                                 'type' => 'hidden',
-                                'value' => $id,
                                 'id' => 'id'
         ));
     ?>
