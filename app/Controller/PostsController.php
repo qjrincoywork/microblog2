@@ -63,7 +63,7 @@ class PostsController extends AppController {
                         mkdir($uploadFolder);
                     }
 
-                    $path = $uploadFolder."/".$this->request->data['Post']['image']['name']. "(" .date('Y-m-d H:i:s'). ")";
+                    $path = $uploadFolder."/".$this->request->data['Post']['image']['name'];
                     
                     if(move_uploaded_file($this->request->data['Post']['image']['tmp_name'],
                                           $path)) {

@@ -45,6 +45,7 @@ $(function () {
                           ".update_picture, .change_password, .cancel_upload," + 
                           ".preview_image, .edit_preview_image", function (event) {
         event.preventDefault();
+        event.stopPropagation();
         
         var form = $(this).closest("form").not(".form-group"),
             action = form.attr("action"),
