@@ -118,6 +118,9 @@
             $commentAgo = $val['Comment']['comment_ago'];
             $commentId = $val['Comment']['id'];
             $myComment = $val['Comment']['user_id'] === $userId ? true : false;
+
+            $commentClassListener = $val['Comment']['deleted'] ? 'restore_comment fas fa-recycle' : 'delete_comment fa fa-trash';
+            $commentTitle = $val['Comment']['deleted'] ? 'Restore' : 'Delete';
             
             $commentButtons = '';
             
@@ -127,7 +130,7 @@
                                             <span href='".$this->Html->url(['controller' => 'comments', 'action' => 'edit', 'id' => $commentId])."' class='edit_comment fa fa-edit' data-toggle='tooltip' data-placement='top' title='Edit' type='button'></span> 
                                         </button>
                                         <button class=''>
-                                            <span href='".$this->Html->url(['controller' => 'comments', 'action' => 'delete', 'id' => $commentId])."' class='delete_comment fa fa-trash' data-toggle='tooltip' data-placement='top' title='Delete' type='button'></span> 
+                                            <span href='".$this->Html->url(['controller' => 'comments', 'action' => 'delete', 'id' => $commentId])."' class='$commentClassListener' data-toggle='tooltip' data-placement='top' title='$commentTitle' type='button'></span> 
                                         </button>
                                     </div>";
             }

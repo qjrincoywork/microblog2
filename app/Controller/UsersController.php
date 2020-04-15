@@ -114,12 +114,13 @@ class UsersController extends AppController {
     
     public function edit() {
         if($this->RequestHandler->isAjax()) {
+            $id = $this->Session->read('User')['id'];
             if($this->request->is('post')) {
                 $datum['success'] = false;
                 $this->response->type('application/json');
                 $this->autoRender = false;
                 unset($this->UserProfile->validate['email']['emailRule-3']);
-                $this->request->data['UserProfile']['id'] = $this->Session->read('User')['id'];
+                $this->request->data['UserProfile']['user_id'] = $id;
                
                 $this->UserProfile->set($this->request->data);
                 if($this->UserProfile->validates($this->request->data)) {
@@ -132,9 +133,9 @@ class UsersController extends AppController {
                 
                 return json_encode($datum);
             }
-            $id = $this->request->params['named']['id'];
+            
             $data = $this->UserProfile->find('first',[
-                'conditions' => ['User.id' => $id]
+                'conditions' => ['UserProfile.user_id' => $id]
             ]);
             
             $this->set('data', $data);

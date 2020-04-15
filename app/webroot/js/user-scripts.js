@@ -39,7 +39,7 @@ var fxUser = {
 
 $(function () {
     fxUser.UIHelper();
-    $("body").on("click", ".post_content, .like_post, .comment_post, .edit_comment, .delete_comment,"+
+    $("body").on("click", ".post_content, .like_post, .comment_post, .edit_comment, .delete_comment, .restore_comment,"+
                           ".edit_post, .share_post, .delete_post, .restore_post,"+
                           ".follow_user, .unfollow_user, .edit_profile, .get_follow," +
                           ".update_picture, .change_password, .cancel_upload," + 
@@ -153,7 +153,7 @@ $(function () {
                         break;
                 }
             } else {
-                // console.log(data);
+                console.log(data);
                 if(data.success) {
                     switch (className)
                     {
@@ -192,6 +192,7 @@ $(function () {
                             case "restore_post":
                             case "edit_comment":
                             case "delete_comment":
+                            case "restore_comment":
                             case "change_password":
                                 fx.displayNotify(
                                     title.charAt(0).toUpperCase() + title.slice(1),

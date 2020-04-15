@@ -27,7 +27,7 @@
                 <?php
                     if($myProfile){
                         $button = "<div class='follow-button col-sm-12 mt-3'>
-                                        <button href='".$this->Html->url(['controller' => 'users', 'action' => 'edit', 'id' => $userId])."' type='button' class='edit_profile btn-sm btn-outline-primary'>Edit profile</button>
+                                        <button href='".$this->Html->url(['controller' => 'users', 'action' => 'edit'])."' type='button' class='edit_profile btn-sm btn-outline-primary'>Edit profile</button>
                                 </div>";
                     } else {
                         $isFollowing = $this->System->isFollowing($id, $userId);

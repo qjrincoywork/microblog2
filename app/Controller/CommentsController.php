@@ -48,7 +48,6 @@ class CommentsController extends AppController {
                 $this->response->type('application/json');
                 $this->autoRender = false;
                 $this->Comment->set($this->request->data);
-
                 
                 if($this->Comment->validates($this->request->data)) {
                     $this->Comment->save(h($this->request->data));
@@ -79,13 +78,13 @@ class CommentsController extends AppController {
                 $this->autoRender = false;
                 
                 if($this->Comment->validates($this->request->data)) {
-                    $this->Comment->delete($this->request->data['Comment']['id']);
+                    $this->Comment->save($this->request->data);
                     $datum['success'] = true;
                 } else {
                     $errors = $this->Comment->validationErrors;
                     $datum['error'] = $errors;
                 }
-                $datum['success'] = true;
+                
                 return json_encode($datum);
             }
 
