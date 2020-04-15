@@ -101,7 +101,7 @@ class SystemHelper extends AppHelper {
     }
     
     public function postReaction($postId, $userId, $reaction) {
-        $isLiked = false;
+        $hasReacted = false;
 
         switch ($reaction) {
             case 'Like':
@@ -124,10 +124,10 @@ class SystemHelper extends AppHelper {
         }
         
         if($data) {
-            $isLiked = true;
+            $hasReacted = true;
         }
         
-        return $isLiked;
+        return $hasReacted;
     }
 
     public function isFollowing($myId, $followingId) {

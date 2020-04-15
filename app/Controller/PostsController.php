@@ -122,7 +122,7 @@ class PostsController extends AppController {
                                                     END";
         $this->paginate = [
             'limit' => 3,
-            'conditions' => ['Comment.post_id' => $id],
+            'conditions' => ['Comment.post_id' => $id, 'Comment.deleted' => 0],
             'order' => [
                 'Comment.created'
             ]
@@ -136,7 +136,6 @@ class PostsController extends AppController {
             $username = $this->Session->read('User')['username'];
             $datum['success'] = false;
             $this->request->data['Post']['user_id'] = $this->Session->read('User')['id'];
-            // $this->request->data['Post']['id'] = $postId;
             $this->response->type('application/json');
             $this->autoRender = false;
 
