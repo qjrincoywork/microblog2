@@ -1,6 +1,7 @@
 <?php
 App::uses('AppModel', 'Model');
 App::uses('BlowfishPasswordHasher', 'Controller/Component/Auth');
+App::uses('CakeSession', 'Model/Datasource');
 
 class User extends AppModel {
     public $actsAs = ['Containable'];
@@ -92,6 +93,7 @@ class User extends AppModel {
 
     public function getPost($postId)
     {
+        $id = CakeSession::read('Auth.User')['id'];
         $this->UserProfile->virtualFields['image'] = "CASE 
                                                         WHEN UserProfile.image IS NULL
                                                             THEN
@@ -114,8 +116,18 @@ class User extends AppModel {
                                                     ELSE concat(datediff(now(), Post.created),' days ago')
                                                 END";
                                                 
-        $data = $this->Post->findById($postId);
-        $data['Post']['content'] = htmlspecialchars_decode($data['Post']['content'], ENT_NOQUOTES);
+        $data = $this->Post->find('first',[
+            'conditions' => ['Post.id' => $postId]
+        ]);
+        
+        if($data) {
+            if(!$data['Post']['deleted'] || $data['Post']['user_id'] == $id) {
+                $data['Post']['content'] = htmlspecialchars_decode($data['Post']['content'], ENT_NOQUOTES);
+            } else {
+                $data = [];
+            }
+        }
+        
         return $data;
     }
 

@@ -1,3 +1,6 @@
+<?php if(empty($data)):?>
+        <span class='container'><h2>Post Deleted</h2></span>
+<?php else:?>
 <?php
     $paginator = $this->Paginator;
     $content = $data['Post']['content'];
@@ -185,3 +188,4 @@
         echo "</nav>";
     }
 ?>
+<?php endif;?>
