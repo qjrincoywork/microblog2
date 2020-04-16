@@ -362,8 +362,8 @@ class UsersController extends AppController {
                             $to = trim($this->request->data['UserProfile']['email']);
                             
                             $message = "Dear <span style='color:#666666'>" . ucwords($name) . "</span>,<br/><br/>";
-                            $message .= "Your account has been created successfully by Administrator.<br/>";
-                            $message .= "Please find the below details of your account: <br/><br/>";
+                            $message .= "Your account has been created successfully.<br/>";
+                            $message .= "Please look at the details of your account below: <br/><br/>";
                             $message .= "<b>Full Name:</b> " . ucwords($name) . "<br/>";
                             $message .= "<b>Email Address:</b> " . $to . "<br/>";
                             $message .= "<b>Username:</b> " . $this->data['User']['username'] . "<br/>";
