@@ -13,7 +13,6 @@
             $postUserId = $value['Post']['user_id'];
             $postFullName = $this->System->getFullNameById($postUserId);
             $userId = $this->Session->read('Auth.User')['id'];
-            $myPost = $postUserId === $userId ? true : false ;
             
             $isLiked = $this->System->postReaction($postId, $userId, 'Like');
             $isCommented = $this->System->postReaction($postId, $userId, 'Comment');
@@ -31,17 +30,6 @@
     
             $article .= "<div class='post-details col-sm-10'>
                             <div class='row'>";
-                            if($myPost) {
-                                
-                            $article .= "<div class='system-action-buttons col-sm-12'>
-                                            <button class='ml-2' style='float: right;'>
-                                                <span href='".$this->Html->url(['controller' => 'posts', 'action' => 'edit', 'post_id' => $postId])."' class='edit_post fa fa-edit float-right' data-toggle='tooltip' data-placement='top' title='Edit' type='button'></span> 
-                                            </button>
-                                            <button class='' style='float: right;'>
-                                                <span href='".$this->Html->url(['controller' => 'posts', 'action' => 'delete', 'post_id' => $postId])."' class='delete_post fa fa-trash float-right' data-toggle='tooltip' data-placement='top' title='Delete' type='button'></span> 
-                                            </button>
-                                        </div>";
-                            }
             $article .=         "<div class='post-user'><a href='".$this->Html->url(['controller' => 'users', 'action' => 'profile', 'user_id' => $postUserId])."'>"
                                     .$postFullName.
                                 "</a></div>
