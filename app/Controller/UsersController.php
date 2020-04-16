@@ -3,7 +3,7 @@ App::uses('AppController', 'Controller');
 
 class UsersController extends AppController {
     public $uses = ['User', 'UserProfile', 'Post', 'Follow'];
-    public $components = ['Security'];
+    // public $components = ['Security'];
 
     public function beforeFilter() {
         $this->Auth->allow('register', 'activation', 'logout', 'testEmail');

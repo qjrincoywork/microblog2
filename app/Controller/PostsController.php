@@ -3,7 +3,7 @@ App::uses('AppController', 'Controller');
 
 class PostsController extends AppController {
     public $uses = ['User', 'UserProfile', 'Post', 'Follow', 'Comment'];
-    public $components = ['Security'];
+    // public $components = ['Security'];
 
     public function beforeFilter() {
         // $this->Security->blackHoleCallback = 'blackhole';

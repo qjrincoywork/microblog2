@@ -1,28 +1,8 @@
 
 <?php
     $paginator = $this->Paginator;
-    $myId = $this->Session->read('User')['id'];
+    $myId = $this->Session->read('Auth.User')['id'];
 ?>
-<!-- <div class="container default-tab pt-4">
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-        <li class="nav-item">
-            <a class="nav-link active" id="users-tab" data-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="true">Similar Users</a>
-        </li>
-        <li class="nav-item">
-            <a class="get_posts nav-link" id="posts-tab" data-toggle="tab" href="#posts" role="tab" aria-controls="posts" aria-selected="false">Similar Posts</a>
-        </li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
-            
-        </div>
-        <div class="tab-pane fade" id="posts" role="tabpanel" aria-labelledby="posts-tab">
-            <div class="container pt-4">
-                <div class="posts-container container"></div>
-            </div>
-        </div>
-    </div>
-</div> -->
 <div class="container default-tab pt-4">
 <?php
     if($data) {
