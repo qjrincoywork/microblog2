@@ -5,7 +5,7 @@
                 <p><strong>NOTE:</strong> Please type your <strong>Password</strong> having 8 characters with At least 1 uppercase letter, lowercase  letters, numbers and 1 special character</p>
             </div>
             <?= $this->Form->create('User',
-                                    ['url' => 'register'],
+                                    ['url' => 'register', 'id' => 'UserRegisterForm'],
                                     ['inputDefaults'=> ['div' => 'form-group']]); ?>
                 <div class="row">
                     <div class="col-md-6">
