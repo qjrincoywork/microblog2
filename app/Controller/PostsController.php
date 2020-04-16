@@ -116,7 +116,7 @@ class PostsController extends AppController {
                                                     END";
         $this->paginate = [
             'limit' => 3,
-            'conditions' => ['Comment.post_id' => $id],
+            'conditions' => ['Comment.post_id' => $id, 'Comment.deleted' => 0],
             'order' => [
                 'Comment.created'
             ]
