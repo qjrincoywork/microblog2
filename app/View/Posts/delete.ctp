@@ -1,19 +1,17 @@
 <div class='card-body card-block mt-3'>
-    <label for='nf-description' class='form-control-label'>Are you sure you wish to <?= $data['Post']['deleted'] ? "restore" : "delete" ?> this post?</label>
+    <label for='nf-description' class='form-control-label'>Are you sure you wish to <?= $this->data['Post']['deleted'] ? "restore" : "delete" ?> this post?</label>
 </div>
 <?= $this->Form->create('Post',
                         ['url' => ['controller' =>'posts', 'action' => 'delete']],
                         ['inputDefaults'=> ['div' => 'form-group']]); ?>
 <?php
-    $label = $data['Post']['deleted'] ? "Restore" : "Delete";
-    $value = $data['Post']['deleted'] ? 0 : 1;
-    $classListener = $data['Post']['deleted'] ? "restore_post" : "delete_post";
-    $postId = $data['Post']['id'];
-
+    $label = $this->data['Post']['deleted'] ? "Restore" : "Delete";
+    $classListener = $this->data['Post']['deleted'] ? "restore_post" : "delete_post";
+    $value = $this->data['Post']['deleted'] ? 0 : 1;
+    
     echo $this->Form->input('id', array(
                             'label' => false,
                             'type' => 'hidden',
-                            'value' => $postId,
                             'id' => 'id'
     ));
 

@@ -233,7 +233,9 @@ class UsersController extends AppController {
             
             return json_encode($datum);
         }
-        $this->request->data = $this->User->findById($id);
+        $data = $this->User->findById($id);
+        unset($data['User']['password']);
+        $this->request->data = $data;
     }
 
     public function search() {

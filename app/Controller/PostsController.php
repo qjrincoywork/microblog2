@@ -139,8 +139,6 @@ class PostsController extends AppController {
             $this->response->type('application/json');
             $this->autoRender = false;
             
-            /* pr($this->request->data);
-            die('hits'); */
             if($this->request->data['Post']['image'] == 'undefined') {
                 unset($this->request->data['Post']['image']);
                 $this->Post->set($this->request->data);
@@ -161,36 +159,13 @@ class PostsController extends AppController {
                     if(!file_exists($uploadFolder)) {
                         mkdir($uploadFolder);
                     }
-                    /* $file = $this->request->data['Post']['image'];
-                    $path = $uploadFolder."/".$file;
-                    $ext = substr(strtolower(strrchr($file, '.')), 1);
-                    $allowedImages = ['jpg', 'jpeg', 'gif', 'png'];
-                    
-                    if(in_array($ext, $allowedImages))
-                    {
-                        pr($file);
-                        pr($path);
-                        die('hits');
-                        if(move_uploaded_file($file, $path)) {
-                            $this->request->data['Post']['image'] = $path;
-                            if($this->Post->save($this->request->data)) {
-                                $this->Flash->success(__("Post Successfully edited."));
-                                return $this->redirect($this->referer());
-                                // $datum['success'] = true;
-                            }
-                        }
-                    } */
-                    /* if(!file_exists($uploadFolder)) {
-                        mkdir($uploadFolder);
-                    } */
+
                     $path = $uploadFolder."/".$this->request->data['Post']['image']['name'];
                     if(move_uploaded_file($this->request->data['Post']['image']['tmp_name'],
                                             $path)) {
                         $this->request->data['Post']['image'] = $path;
                         
                         if($this->Post->save($this->request->data)) {
-                            // $this->Flash->success(__("Post Successfully edited."));
-                            // return $this->redirect($this->referer());
                             $datum['success'] = true;
                         }
                     }
@@ -205,9 +180,9 @@ class PostsController extends AppController {
 
     public function delete() {
         if($this->RequestHandler->isAjax()) {
-            if($this->request->is('post')) {
+            if($this->request->is('put')) {
                 $datum['success'] = false;
-
+                
                 $this->response->type('application/json');
                 $this->autoRender = false;
                 $this->Post->set($this->request->data);
@@ -222,10 +197,9 @@ class PostsController extends AppController {
                 
                 return json_encode($datum);
             }
-
+            
             $postId = $this->request->params['named']['post_id'];
-            $data = $this->User->getPost($postId);
-            $this->set('data', $data);
+            $this->request->data = $this->User->getPost($postId);
         }
     }
 }

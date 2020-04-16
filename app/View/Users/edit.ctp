@@ -3,13 +3,6 @@
                             ['url' => ['controller'=>'users','action'=>'edit']],
                             ['inputDefaults'=> ['div' => 'form-group']]); ?>
     <?php
-        // echo $this->Form->unlockField('UserProfile.id');
-        
-        /* echo $this->Form->input('UserProfile.id',
-                            ['class' => 'form-control',
-                            'type' => 'hidden',
-                            'id' => 'id',
-                            'value' => $data['UserProfile']['id']]); */
         echo $this->Form->input('UserProfile.email',
                             ['class' => 'form-control',
                             'placeholder' => 'Enter email ...',
@@ -35,7 +28,6 @@
                                 ['class' => 'form-control',
                                 'placeholder' => 'Enter first name ...',
                                 'id' => 'first_name',
-                                // 'value' => $data['UserProfile']['first_name'],
                                 'label'=>['text'=>'First Name',
                                         'for' => 'first_name',
                                         'class'=>'col-form-label']]);
@@ -43,14 +35,12 @@
                             ['class' => 'form-control',
                             'placeholder' => 'Enter last name ...',
                             'id' => 'last_name',
-                            // 'value' => $data['UserProfile']['last_name'],
                                 'label'=>['text'=>'Last name',
                                         'for' => 'last_name',
                                         'class'=>'col-form-label']]);
         echo $this->Form->input('UserProfile.middle_name',
                             ['class' => 'form-control',
                             'placeholder' => 'Enter middle name ...',
-                            // 'value' => $data['UserProfile']['middle_name'],
                             'id' => 'middle_name',
                                 'label'=>['text'=>'Middle Name',
                                         'for' => 'middle_name',

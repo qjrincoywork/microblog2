@@ -3,7 +3,7 @@
     $id = $this->data['Post']['id'];
     $postAgo = $this->data['Post']['post_ago'];
     $profPic = $this->data['UserProfile']['image'];
-    $userId = $this->Session->read('User')['id'];
+    $userId = $this->Session->read('Auth.User')['id'];
     $postImage = !empty($this->data['Post']['image']) ? "/".$this->data['Post']['image'] : '';
     $fullName = $this->System->getFullNameById($userId);
 ?>

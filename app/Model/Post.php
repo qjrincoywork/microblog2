@@ -55,7 +55,8 @@ class Post extends AppModel {
 
     public function isMine() {
         $id = $this->data[$this->alias]['id'];
-        $userId = CakeSession::read('User.id');
+        $userId = CakeSession::read('Auth.User')['id'];
+        
         $data = $this->find('first', [
             'conditions' => [$this->alias.'.id' => $id, $this->alias.'.user_id' => $userId]
         ]);
