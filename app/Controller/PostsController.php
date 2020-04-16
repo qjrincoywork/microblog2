@@ -6,7 +6,7 @@ class PostsController extends AppController {
     public $components = ['Security'];
 
     public function beforeFilter() {
-        $this->Security->blackHoleCallback = 'blackhole';
+        // $this->Security->blackHoleCallback = 'blackhole';
         // $this->Security->validatePost = false;
         // $this->Security->requireAuth();
         $this->layout = 'main';

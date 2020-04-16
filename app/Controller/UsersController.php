@@ -7,7 +7,7 @@ class UsersController extends AppController {
 
     public function beforeFilter() {
         $this->Auth->allow('register', 'activation', 'logout', 'testEmail');
-        $this->Security->blackHoleCallback = 'blackhole';
+        // $this->Security->blackHoleCallback = 'blackhole';
         // $this->Security->validatePost = false;
         // $this->Security->requireSecure();
         $this->layout = 'main';
