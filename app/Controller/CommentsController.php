@@ -18,7 +18,7 @@ class CommentsController extends AppController {
         if($this->RequestHandler->isAjax()) {
             if($this->request->is('post')) {
                 $datum['success'] = false;
-                $this->request->data['Comment']['user_id'] = $this->Session->read('User')['id'];
+                $this->request->data['Comment']['user_id'] = $this->Session->read('Auth.User')['id'];
                 $this->response->type('application/json');
                 $this->autoRender = false;
                 $this->Comment->set($this->request->data);
@@ -44,7 +44,7 @@ class CommentsController extends AppController {
         if($this->RequestHandler->isAjax()) {
             if($this->request->is('put')) {
                 $datum['success'] = false;
-                $this->request->data['Comment']['user_id'] = $this->Session->read('User')['id'];
+                $this->request->data['Comment']['user_id'] = $this->Session->read('Auth.User')['id'];
                 $this->response->type('application/json');
                 $this->autoRender = false;
                 $this->Comment->set($this->request->data);
@@ -69,7 +69,7 @@ class CommentsController extends AppController {
     public function delete() {
         if($this->RequestHandler->isAjax()) {
             if($this->request->is('put')) {
-                $this->request->data['Comment']['user_id'] = $this->Session->read('User')['id'];
+                $this->request->data['Comment']['user_id'] = $this->Session->read('Auth.User')['id'];
                 $datum['success'] = false;
                 $this->response->type('application/json');
                 $this->autoRender = false;

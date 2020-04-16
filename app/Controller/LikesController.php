@@ -20,7 +20,7 @@ class LikesController extends AppController {
             $this->autoRender = false;
             $datum['success'] = false;
             $like['Like']['post_id'] = $this->request->data['post_id'];
-            $like['Like']['user_id'] = $this->Session->read('User')['id'];
+            $like['Like']['user_id'] = $this->Session->read('Auth.User')['id'];
             
             $exists = $this->Like->find('first', [
                 'conditions' => [

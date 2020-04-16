@@ -32,10 +32,10 @@ class PostsController extends AppController {
     }
     
     public function add() {
-        if($this->request->is('ajax')) {
-            $username = $this->Session->read('User')['username'];
+        if($this->request->is('post')) {
+            $username = $this->Session->read('Auth.User')['username'];
             $datum['success'] = false;
-            $this->request->data['Post']['user_id'] = $this->Session->read('User')['id'];
+            $this->request->data['Post']['user_id'] = $this->Session->read('Auth.User')['id'];
             $this->response->type('application/json');
             $this->autoRender = false;
             $this->Post->set($this->request->data);
@@ -79,7 +79,7 @@ class PostsController extends AppController {
         if($this->RequestHandler->isAjax()) {
             if($this->request->is('post')) {
                 $datum['success'] = false;
-                $this->request->data['Post']['user_id'] = $this->Session->read('User')['id'];
+                $this->request->data['Post']['user_id'] = $this->Session->read('Auth.User')['id'];
                 $this->response->type('application/json');
                 $this->autoRender = false;
                 $this->Post->set($this->request->data);
@@ -133,9 +133,9 @@ class PostsController extends AppController {
         }
         
         if($this->request->is('put')) {
-            $username = $this->Session->read('User')['username'];
+            $username = $this->Session->read('Auth.User')['username'];
             $datum['success'] = false;
-            $this->request->data['Post']['user_id'] = $this->Session->read('User')['id'];
+            $this->request->data['Post']['user_id'] = $this->Session->read('Auth.User')['id'];
             $this->response->type('application/json');
             $this->autoRender = false;
             
