@@ -233,10 +233,7 @@
  * the cake shell command: cake schema create Sessions
  */
 	Configure::write('Session', array(
-		// 'defaults' => 'php'
-        'defaults' => 'cake',
-        'cookie' => 'CAKEPHP2',
-        'ini' => ['session.use_trans_sid' => true]
+		'defaults' => 'php'
 	));
 
 /**

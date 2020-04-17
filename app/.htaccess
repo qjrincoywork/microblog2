@@ -9,6 +9,5 @@
 <IfModule mod_rewrite.c>
    RewriteEngine on
    RewriteRule ^$ webroot/    [L]
-   RewriteCond %{REQUEST_URI} !^/(img|css|js)/(.*)$
    RewriteRule (.*) webroot/$1    [L]
 </IfModule>
